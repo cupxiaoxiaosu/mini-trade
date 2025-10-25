@@ -1,4 +1,20 @@
-import React, { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { connect, TradeLists, KlineLists,  WebSocketMessage, WebSocketCallbacks } from '../adaptor/biance/index';
+
+// 订单簿条目接口
+interface OrderBookEntry {
+  price: number;
+  quantity: number;
+}
+
+// 订单簿接口
+interface OrderBookData {
+  bids: OrderBookEntry[];
+  asks: OrderBookEntry[];
+}
+
+// 交易列表接口
+
 
 interface UseBinanceWebSocketOptions {
   symbol?: string;
@@ -8,121 +24,113 @@ interface UseBinanceWebSocketOptions {
 interface UseBinanceWebSocketReturn {
   isConnected: boolean;
   lastPrice: string | null;
+  orderBook: OrderBookData;
   error: Error | null;
-  connect: () => void;
+  connect: (newSymbol?: string) => void;
   disconnect: () => void;
+  trade: TradeLists;
+  kline: KlineLists;
 }
 
-export const useBinanceWebSocket = ({
-  symbol = 'ethusdt',
-  url
-}: UseBinanceWebSocketOptions = {}): UseBinanceWebSocketReturn => {
-  const [isConnected, setIsConnected] = useState(false);
-  const [lastPrice, setLastPrice] = useState<string | null>(null);
-  const [error, setError] = useState<Error | null>(null);
+export const useBinanceWebSocket = ({}: UseBinanceWebSocketOptions = {}): UseBinanceWebSocketReturn => {
   const wsRef = useRef<WebSocket | null>(null);
 
-  // 使用与binance-ws.js相同的URL配置
-  const wsUrl = url || `wss://stream.testnet.binance.vision/ws/${symbol}@trade`;
+  const [trade, setTrade] = useState<TradeLists>({
+    ETHUSDT: [],
+    BTCUSDT: [],
+    SOLUSDT: [],
+  });
+  
+  const [kline, setKline] = useState<KlineLists>({
+    ETHUSDT: [],
+    BTCUSDT: [],
+    SOLUSDT: [],
+  });
 
-  // 连接WebSocket - 严格按照binance-ws.js的逻辑实现
-  const connect = useCallback(() => {
-    try {
-      // 重置错误状态
-      setError(null);
-      
-      // 如果已经连接，先断开
-      if (wsRef.current) {
-        wsRef.current.close();
-        wsRef.current = null;
-      }
+  const [isConnected, setIsConnected] = useState(false);
+  const [error, setError] = useState<Error | null>(null);
 
-      console.log(`正在连接到 Binance 测试网 - ${symbol.toUpperCase()}`);
+  // 连接WebSocket
+  const handleConnect = () => {
+    // 如果已经连接，先断开
+    if (wsRef.current) {
+      wsRef.current.close();
+      wsRef.current = null;
+    }
 
-      // 创建新的WebSocket连接
-      wsRef.current = new WebSocket(wsUrl);
-
-      // onopen事件处理 - 与binance-ws.js保持一致
-      wsRef.current.onopen = () => {
+    const callbacks: WebSocketCallbacks = {
+        onmessage(message: WebSocketMessage) {
+          // 从data中获取交易数据
+          const data = message as any; // 使用类型断言保持原有逻辑
+          const symbol = data.s;
+          
+          if(data.e === 'trade') {
+            setTrade(prev => {
+              const newList = [...prev[symbol as keyof TradeLists], data];
+              return {
+                ...prev,
+                [symbol]: newList.slice(-20)
+              };
+            });
+          }
+          else if(data.e === 'kline') {
+            setKline(prev => {
+              const newList = [...prev[symbol as keyof KlineLists], data];
+              return {
+                ...prev,
+                [symbol]: newList.slice(-50)
+              };
+            });
+          } else {
+            console.log('mmm', message)
+          }
+        },
+      onerror(error: Event) {
+        console.error('WebSocket连接错误:', error);
+        setError(new Error('WebSocket连接错误'));
+        setIsConnected(false);
+      },
+      onclose() {
+        console.log('连接已关闭');
+        setIsConnected(false);
+      },
+      onopen() {
+        console.log('连接已建立');
         setIsConnected(true);
         setError(null);
-        console.log(`成功连接到 Binance 测试网 - ${symbol.toUpperCase()}`);
+      },
+    };
 
-        // 发送订阅消息 - 与binance-ws.js中的订阅逻辑完全一致
-        const subscribeMessage = {
-          method: 'SUBSCRIBE',
-          params: [`${symbol}@trade`],
-          id: 1
-        };
-        wsRef.current?.send(JSON.stringify(subscribeMessage));
-      };
+    wsRef.current = connect(callbacks);
+  };
 
-      // onmessage事件处理 - 按照binance-ws.js的方式处理
-      wsRef.current.onmessage = (event) => {
-        try {
-          // 解析消息，不强制类型转换
-          const message = JSON.parse(event.data);
-          
-          // 处理订阅确认消息
-          if (message.id && message.result === null) {
-            console.log(`成功订阅 ${symbol.toUpperCase()}@trade 流`);
-            return;
-          }
-          
-          // 更新最新价格 - 只要消息包含价格字段就更新
-          if (message.p) {
-            setLastPrice(message.p);
-          }
-        } catch (parseError) {
-          console.error('解析消息失败:', parseError);
-          // 不设置错误状态，避免因格式问题中断正常流程
-        }
-      };
-
-      // onerror事件处理
-      wsRef.current.onerror = (wsError) => {
-        const errorObj = wsError instanceof Error ? wsError : new Error('WebSocket连接错误');
-        console.error('WebSocket错误:', errorObj);
-        setError(errorObj);
-        // 错误时设置断开连接状态
-        setIsConnected(false);
-      };
-
-      // onclose事件处理
-      wsRef.current.onclose = (event) => {
-        setIsConnected(false);
-        console.log(`连接已关闭: ${event.code} - ${event.reason || '无原因'}`);
-      };
-    } catch (connectError) {
-      const errorObj = connectError instanceof Error ? connectError : new Error(String(connectError));
-      console.error('连接初始化失败:', errorObj);
-      setError(errorObj);
-      setIsConnected(false);
-    }
-  }, [symbol, wsUrl]);
-
-  // 断开连接 - 严格按照binance-ws.js的逻辑
-  const disconnect = useCallback(() => {
+  // 断开连接
+  const disconnect = () => {
     if (wsRef.current) {
       wsRef.current.close();
       wsRef.current = null;
       setIsConnected(false);
       console.log('已主动断开连接');
     }
-  }, []);
+  };
 
-  // 组件卸载时断开连接
-  React.useEffect(() => {
+  // 组件挂载时自动连接
+  useEffect(() => {
+    handleConnect();
+    
     return () => {
       disconnect();
     };
-  }, [disconnect]);
+  }, []);
 
   return {
+    trade,
+    kline,
     isConnected,
-    lastPrice,
+    lastPrice: null,
+    orderBook: { bids: [], asks: [] },
     error,
-    connect,
+    connect: handleConnect,
     disconnect
   };
 };
