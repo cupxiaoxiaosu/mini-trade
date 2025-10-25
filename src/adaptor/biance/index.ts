@@ -52,6 +52,25 @@ export interface KlineLists {
   SOLUSDT: KlineData[];
 }
 
+// BookTicker数据接口（行情数据）
+export interface BookTickerData {
+  e: string;  
+  u: number; 
+  s: string;  
+  b: string; 
+  B: string;  
+  a: string;
+  A: string;  
+
+}
+
+// BookTicker列表接口
+export interface BookTickerLists {
+  ETHUSDT: BookTickerData | null;
+  BTCUSDT: BookTickerData | null;
+  SOLUSDT: BookTickerData | null;
+}
+
 // WebSocket消息接口
 export interface WebSocketMessage {
   stream: string;

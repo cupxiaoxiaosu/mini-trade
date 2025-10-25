@@ -3,12 +3,13 @@ import { useBinanceWebSocket } from '../hooks/useBinanceWebSocket';
 type token = 'ETHUSDT' | 'BTCUSDT' | 'SOLUSDT';
 import OrderBook from './OrderBook';
 import { Kline } from './Kline';
+import BookTicker from './BookTicker';
 import { Select, Button, Badge } from 'antd';
 import { CaretRightOutlined, CloseOutlined } from '@ant-design/icons';
 
 import './OrderBook.css';
 const Main: React.FC = () => {
-  const { isConnected, connect, disconnect, error, trade, kline } = useBinanceWebSocket();
+  const { isConnected, connect, disconnect, error, trade, kline, bookTicker } = useBinanceWebSocket();
   const [selectedToken, setSelectedToken] = useState<token>('ETHUSDT');
 
   
@@ -69,9 +70,13 @@ const Main: React.FC = () => {
       </div>
 
       <div className="trade-data">
-        <h3>Kline</h3>
+        <h3>行情数据</h3>
+        <BookTicker data={bookTicker[selectedToken]} token={selectedToken} />
+      </div>
+      
+      <div className="trade-data">
+        <h3>K线图</h3>
         <Kline data={kline[selectedToken]} token={selectedToken} />
-        {/* 交易数据将在这里显示 */}
       </div>
 
       <div className="trade-data">

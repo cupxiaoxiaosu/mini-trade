@@ -1,1 +1,1 @@
-{"root":["./src/app.tsx","./src/main.tsx","./src/adaptor/biance/index.ts","./src/components/kline.tsx","./src/components/main.tsx","./src/components/orderbook.tsx","./src/hooks/usebinancewebsocket.ts"],"version":"5.9.3"}
+{"root":["./src/app.tsx","./src/main.tsx","./src/adaptor/biance/index.ts","./src/components/bookticker.tsx","./src/components/kline.tsx","./src/components/main.tsx","./src/components/orderbook.tsx","./src/hooks/usebinancewebsocket.ts"],"version":"5.9.3"}

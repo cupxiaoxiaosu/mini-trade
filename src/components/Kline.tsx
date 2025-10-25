@@ -26,7 +26,7 @@ interface KlineProps {
   token: token;
 }
 
-export const Kline: React.FC<KlineProps> = ({ data, token }) => {
+export const Kline: React.FC<KlineProps> = ({ token }) => {
   // 处理传入的数据（虽然Timeline组件主要使用自己的数据源，但我们保留对data的引用以满足要求）
   
 

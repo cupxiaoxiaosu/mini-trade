@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { connect, TradeLists, KlineLists,  WebSocketMessage, WebSocketCallbacks } from '../adaptor/biance/index';
+import { connect, TradeLists, KlineLists, BookTickerLists, WebSocketMessage, WebSocketCallbacks } from '../adaptor/biance/index';
 
 // 订单簿条目接口
 interface OrderBookEntry {
@@ -30,6 +30,7 @@ interface UseBinanceWebSocketReturn {
   disconnect: () => void;
   trade: TradeLists;
   kline: KlineLists;
+  bookTicker: BookTickerLists;
 }
 
 export const useBinanceWebSocket = ({}: UseBinanceWebSocketOptions = {}): UseBinanceWebSocketReturn => {
@@ -45,6 +46,12 @@ export const useBinanceWebSocket = ({}: UseBinanceWebSocketOptions = {}): UseBin
     ETHUSDT: [],
     BTCUSDT: [],
     SOLUSDT: [],
+  });
+
+  const [bookTicker, setBookTicker] = useState<BookTickerLists>({
+    ETHUSDT: null,
+    BTCUSDT: null,
+    SOLUSDT: null,
   });
 
   const [isConnected, setIsConnected] = useState(false);
@@ -81,9 +88,13 @@ export const useBinanceWebSocket = ({}: UseBinanceWebSocketOptions = {}): UseBin
                 [symbol]: newList.slice(-50)
               };
             });
-          } else {
-            console.log('mmm', message)
-          }
+          } else  {
+            // 处理bookTicker行情数据
+            setBookTicker(prev => ({
+              ...prev,
+              [symbol]: data
+            }));
+          } 
         },
       onerror(error: Event) {
         console.error('WebSocket连接错误:', error);
@@ -126,6 +137,7 @@ export const useBinanceWebSocket = ({}: UseBinanceWebSocketOptions = {}): UseBin
   return {
     trade,
     kline,
+    bookTicker,
     isConnected,
     lastPrice: null,
     orderBook: { bids: [], asks: [] },
