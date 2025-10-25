@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>币安测试网 ETH/USDT 实时价格</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #f5a623 0%, #f8e71c 100%);
+            color: #333;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid #f8e71c;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .content {
+            padding: 20px;
+        }
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            background-color: #f0f2f5;
+        }
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #ff4757;
+            transition: background-color 0.3s ease;
+        }
+        .status-indicator.connected {
+            background-color: #2ed573;
+        }
+        .status-text {
+            font-weight: 500;
+        }
+        .price-display {
+            text-align: center;
+            margin: 30px 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid #f5a623;
+        }
+        .current-price {
+            font-size: 48px;
+            font-weight: bold;
+            color: #2d3436;
+            margin: 10px 0;
+        }
+        .price-direction {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .price-direction.up {
+            background-color: #dff0d8;
+            color: #3c763d;
+        }
+        .price-direction.down {
+            background-color: #f2dede;
+            color: #a94442;
+        }
+        .trades-container {
+            margin-top: 30px;
+        }
+        .trades-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #2d3436;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .trades-title::before {
+            content: '';
+            width: 4px;
+            height: 20px;
+            background-color: #f5a623;
+            border-radius: 2px;
+        }
+        .trades-list {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 0;
+            margin: 0;
+            list-style: none;
+        }
+        .trade-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background-color 0.2s ease;
+        }
+        .trade-item:hover {
+            background-color: #f8f9fa;
+        }
+        .trade-item:last-child {
+            border-bottom: none;
+        }
+        .trade-time {
+            font-size: 14px;
+            color: #636e72;
+            font-family: monospace;
+        }
+        .trade-direction {
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+        .trade-direction.buy {
+            background-color: #dff0d8;
+            color: #3c763d;
+        }
+        .trade-direction.sell {
+            background-color: #f2dede;
+            color: #a94442;
+        }
+        .trade-price {
+            font-weight: 600;
+            color: #2d3436;
+        }
+        .trade-quantity {
+            font-size: 14px;
+            color: #636e72;
+        }
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-connect {
+            background-color: #2ed573;
+            color: white;
+        }
+        .btn-connect:hover:not(:disabled) {
+            background-color: #26c269;
+            transform: translateY(-1px);
+        }
+        .btn-disconnect {
+            background-color: #ff6b6b;
+            color: white;
+        }
+        .btn-disconnect:hover:not(:disabled) {
+            background-color: #ff5252;
+            transform: translateY(-1px);
+        }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .error-message {
+            color: #ff4757;
+            background-color: #ffeaea;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #ff4757;
+        }
+        .info-message {
+            color: #2196f3;
+            background-color: #e3f2fd;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            border-left: 4px solid #2196f3;
+        }
+        /* 滚动条样式 */
+        .trades-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        .trades-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+        .trades-list::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 3px;
+        }
+        .trades-list::-webkit-scrollbar-thumb:hover {
+            background: #a1a1a1;
+        }
+        /* 响应式设计 */
+        @media (max-width: 600px) {
+            .current-price {
+                font-size: 36px;
+            }
+            .trade-item {
+                flex-wrap: wrap;
+                gap: 8px;
+            }
+            .trade-time {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>币安测试网 ETH/USDT 实时价格监控</h1>
+        </div>
+        
+        <div class="content">
+            <div class="connection-status">
+                <div id="statusIndicator" class="status-indicator"></div>
+                <span id="statusText" class="status-text">未连接</span>
+            </div>
+            
+            <div class="price-display">
+                <div>ETH/USDT 当前价格</div>
+                <div id="currentPrice" class="current-price">--.--</div>
+                <div id="priceDirection" class="price-direction">等待数据...</div>
+            </div>
+            
+            <div class="trades-container">
+                <div class="trades-title">最近交易记录</div>
+                <ul id="tradesList" class="trades-list">
+                    <li style="text-align: center; padding: 20px; color: #636e72;">等待连接并接收交易数据...</li>
+                </ul>
+            </div>
+            
+            <div class="controls">
+                <button id="connectBtn" class="btn btn-connect">连接到币安测试网</button>
+                <button id="disconnectBtn" class="btn btn-disconnect" disabled>断开连接</button>
+            </div>
+            
+            <div id="messageArea" style="display: none;"></div>
+        </div>
+    </div>
+
+    <!-- 引入币安 WebSocket 客户端模块 -->
+    <script src="binance-ws.js"></script>
+    <script>
+        // DOM 元素引用
+        const statusIndicator = document.getElementById('statusIndicator');
+        const statusText = document.getElementById('statusText');
+        const currentPrice = document.getElementById('currentPrice');
+        const priceDirection = document.getElementById('priceDirection');
+        const tradesList = document.getElementById('tradesList');
+        const connectBtn = document.getElementById('connectBtn');
+        const disconnectBtn = document.getElementById('disconnectBtn');
+        const messageArea = document.getElementById('messageArea');
+        
+        // 全局变量
+        let binanceClient = null;
+        let lastPrice = null;
+        let tradeCount = 0;
+        const MAX_TRADES_DISPLAY = 50;
+        const SYMBOL = 'ethusdt';
+        
+        // 初始化 Binance WebSocket 客户端
+        function initBinanceClient() {
+            // 创建新的客户端实例
+            binanceClient = new BinanceWebSocketClient({
+                symbol: SYMBOL
+            });
+            
+            // 注册事件监听器
+            binanceClient
+                .on('open', handleConnectionOpen)
+                .on('message', handleMessageReceived)
+                .on('error', handleConnectionError)
+                .on('close', handleConnectionClose);
+        }
+        
+        // 显示消息的函数
+        function showMessage(type, message) {
+            messageArea.className = type === 'error' ? 'error-message' : 'info-message';
+            messageArea.textContent = message;
+            messageArea.style.display = 'block';
+            
+            // 3秒后自动隐藏信息
+            if (type !== 'error') {
+                setTimeout(() => {
+                    messageArea.style.display = 'none';
+                }, 3000);
+            }
+        }
+        
+        // 处理连接成功
+        function handleConnectionOpen() {
+            statusIndicator.className = 'status-indicator connected';
+            statusText.textContent = '已连接';
+            disconnectBtn.disabled = false;
+            showMessage('info', `已成功连接到币安测试网，正在接收 ${SYMBOL.toUpperCase()} 交易数据...`);
+        }
+        
+        // 处理接收到的消息
+        function handleMessageReceived(message) {
+            // 处理订阅确认消息
+            if (message.id && message.result === null) {
+                console.log(`成功订阅 ${SYMBOL.toUpperCase()}@trade 流`);
+                tradesList.innerHTML = '';
+                return;
+            }
+            
+            // 处理交易数据
+            if (message.p) { // 交易数据包含价格字段
+                const price = parseFloat(message.p);
+                const quantity = parseFloat(message.q);
+                const isBuyerMaker = message.m;
+                const direction = isBuyerMaker ? '卖出' : '买入';
+                const directionClass = isBuyerMaker ? 'sell' : 'buy';
+                const time = new Date(message.T).toLocaleTimeString();
+                
+                // 更新当前价格显示
+                currentPrice.textContent = price.toFixed(2);
+                
+                // 判断价格方向
+                if (lastPrice !== null) {
+                    if (price > lastPrice) {
+                        priceDirection.className = 'price-direction up';
+                        priceDirection.textContent = `上涨 +${(price - lastPrice).toFixed(2)}`;
+                    } else if (price < lastPrice) {
+                        priceDirection.className = 'price-direction down';
+                        priceDirection.textContent = `下跌 ${(price - lastPrice).toFixed(2)}`;
+                    }
+                } else {
+                    priceDirection.className = 'price-direction';
+                    priceDirection.textContent = '初始价格';
+                }
+                lastPrice = price;
+                
+                // 添加交易记录到列表
+                const tradeItem = document.createElement('li');
+                tradeItem.className = 'trade-item';
+                tradeItem.innerHTML = `
+                    <span class="trade-time">${time}</span>
+                    <span class="trade-direction ${directionClass}">${direction}</span>
+                    <span class="trade-price">$${price.toFixed(2)}</span>
+                    <span class="trade-quantity">数量: ${quantity.toFixed(6)}</span>
+                `;
+                
+                // 添加到列表顶部
+                tradesList.insertBefore(tradeItem, tradesList.firstChild);
+                
+                // 限制显示的交易记录数量
+                tradeCount++;
+                if (tradeCount > MAX_TRADES_DISPLAY) {
+                    tradesList.removeChild(tradesList.lastChild);
+                }
+            }
+        }
+        
+        // 处理连接错误
+        function handleConnectionError(error) {
+            console.error('WebSocket错误:', error);
+            showMessage('error', `连接错误: 请检查网络连接或稍后再试`);
+            resetConnectionState();
+        }
+        
+        // 处理连接关闭
+        function handleConnectionClose(event) {
+            console.log(`连接已关闭: ${event.code} - ${event.reason || '无原因'}`);
+            showMessage('info', `连接已关闭: ${event.reason || '无原因'}`);
+            resetConnectionState();
+        }
+        
+        // 连接到币安测试网
+        function connectToBinance() {
+            try {
+                // 初始化客户端
+                if (!binanceClient) {
+                    initBinanceClient();
+                }
+                
+                tradesList.innerHTML = '<li style="text-align: center; padding: 20px; color: #636e72;">正在连接到币安测试网...</li>';
+                statusIndicator.className = 'status-indicator';
+                statusText.textContent = '正在连接...';
+                connectBtn.disabled = true;
+                
+                // 连接到服务器
+                binanceClient.connect();
+                
+            } catch (error) {
+                console.error('连接初始化失败:', error);
+                showMessage('error', `初始化连接失败: ${error.message}`);
+                resetConnectionState();
+            }
+        }
+        
+        // 断开连接
+        function disconnectFromBinance() {
+            if (binanceClient) {
+                binanceClient.disconnect();
+            }
+            resetConnectionState();
+            showMessage('info', '已断开与币安测试网的连接');
+        }
+        
+        // 重置连接状态
+        function resetConnectionState() {
+            statusIndicator.className = 'status-indicator';
+            statusText.textContent = '未连接';
+            connectBtn.disabled = false;
+            disconnectBtn.disabled = true;
+            lastPrice = null;
+            tradeCount = 0;
+        }
+        
+        // 事件监听器
+        connectBtn.addEventListener('click', connectToBinance);
+        disconnectBtn.addEventListener('click', disconnectFromBinance);
+        
+        // 页面加载完成后，尝试自动连接
+        window.addEventListener('load', () => {
+            // 自动连接到币安测试网
+            connectToBinance();
+        });
+        
+        // 处理页面关闭事件，优雅断开连接
+        window.addEventListener('beforeunload', () => {
+            if (binanceClient) {
+                binanceClient.disconnect();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,177 @@
+/* 订单簿容器 */
+.order-book {
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 16px;
+  background-color: #ffffff;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* 订单簿头部 */
+.order-book-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.order-book-header h3 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 1.25rem;
+}
+
+/* 连接状态 */
+.connection-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.875rem;
+  color: #64748b;
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #ef4444;
+}
+
+.status-indicator.connected {
+  background-color: #10b981;
+}
+
+/* 最新价格显示 */
+.last-price {
+  background-color: #f8fafc;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  text-align: center;
+  font-size: 1.125rem;
+}
+
+.last-price strong {
+  color: #3b82f6;
+  font-size: 1.5rem;
+}
+
+/* 错误消息 */
+.error-message {
+  background-color: #fee2e2;
+  color: #dc2626;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  border: 1px solid #fecaca;
+}
+
+/* 订单簿内容区域 */
+.order-book-content {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.asks-section,
+.bids-section {
+  flex: 1;
+}
+
+.asks-section h4,
+.bids-section h4 {
+  margin: 0 0 12px 0;
+  color: #334155;
+  font-size: 1rem;
+  text-align: center;
+}
+
+/* 订单表格 */
+.order-table {
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.table-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  background-color: #f1f5f9;
+  padding: 10px;
+  font-weight: 600;
+  color: #64748b;
+  font-size: 0.875rem;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.order-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  padding: 8px 10px;
+  font-size: 0.875rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.order-row:last-child {
+  border-bottom: none;
+}
+
+.order-row.ask {
+  background-color: #fef2f2;
+  color: #ef4444;
+}
+
+.order-row.bid {
+  background-color: #f0fdf4;
+  color: #16a34a;
+}
+
+/* 控制按钮 */
+.controls {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.controls button {
+  padding: 8px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background-color: #ffffff;
+  color: #374151;
+  cursor: pointer;
+  font-size: 0.875rem;
+  transition: all 0.2s;
+}
+
+.controls button:hover:not(:disabled) {
+  background-color: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.controls button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.controls button:first-child:not(:disabled) {
+  background-color: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+}
+
+.controls button:first-child:hover:not(:disabled) {
+  background-color: #2563eb;
+}
+
+/* 响应式设计 */
+@media (max-width: 640px) {
+  .order-book-content {
+    flex-direction: column;
+  }
+  
+  .order-book {
+    margin: 0 16px;
+  }
+}
