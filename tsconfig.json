@@ -23,6 +23,6 @@
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src"],
+  "include": ["src", "scripts/balance.js"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

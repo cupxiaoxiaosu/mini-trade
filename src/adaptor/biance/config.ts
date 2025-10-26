@@ -1,0 +1,2 @@
+export const API_KEY = 'RJKPkTREsqmT6kSYoKby6Liit2E4i8t6qGsac2IOwdT94PhwStZu5REt6cQdRd6j';
+export const API_SECRET = 'mofkW3kMibeLfY4JmQvS5qIbjTPXlVtQhbKh5MQKEIQoKmKJJQVxkWzi2LRQ97ch';

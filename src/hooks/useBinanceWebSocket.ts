@@ -1,30 +1,13 @@
 import { useState, useRef, useEffect } from 'react';
 import { connect, TradeLists, KlineLists, BookTickerLists, WebSocketMessage, WebSocketCallbacks } from '../adaptor/biance/index';
 
-// 订单簿条目接口
-interface OrderBookEntry {
-  price: number;
-  quantity: number;
-}
-
-// 订单簿接口
-interface OrderBookData {
-  bids: OrderBookEntry[];
-  asks: OrderBookEntry[];
-}
-
-// 交易列表接口
 
 
-interface UseBinanceWebSocketOptions {
-  symbol?: string;
-  url?: string;
-}
+
+
 
 interface UseBinanceWebSocketReturn {
   isConnected: boolean;
-  lastPrice: string | null;
-  orderBook: OrderBookData;
   error: Error | null;
   connect: (newSymbol?: string) => void;
   disconnect: () => void;
@@ -33,7 +16,9 @@ interface UseBinanceWebSocketReturn {
   bookTicker: BookTickerLists;
 }
 
-export const useBinanceWebSocket = ({}: UseBinanceWebSocketOptions = {}): UseBinanceWebSocketReturn => {
+
+
+export const useBinanceWebSocket = (): UseBinanceWebSocketReturn => {
   const wsRef = useRef<WebSocket | null>(null);
 
   const [trade, setTrade] = useState<TradeLists>({
@@ -139,8 +124,6 @@ export const useBinanceWebSocket = ({}: UseBinanceWebSocketOptions = {}): UseBin
     kline,
     bookTicker,
     isConnected,
-    lastPrice: null,
-    orderBook: { bids: [], asks: [] },
     error,
     connect: handleConnect,
     disconnect

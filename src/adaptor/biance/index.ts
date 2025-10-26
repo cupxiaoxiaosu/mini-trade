@@ -94,11 +94,16 @@ const streams = [
   'ethusdt@bookTicker',
   'btcusdt@bookTicker',
   'solusdt@bookTicker',
+  'eth@outboundAccountPosition',
+  'btc@outboundAccountPosition',
+  'sol@outboundAccountPosition',
 ]
 export type token = 'ETHUSDT' | 'BTCUSDT' | 'SOLUSDT';
+const TESTNET = 'wss://stream.testnet.binance.vision/ws'
+const MAINNET = 'wss://stream.binance.com:9443/ws'
 // 连接WebSocket的函数
 export function connect(callbacks: WebSocketCallbacks): WebSocket {
-  const ws = new WebSocket(`wss://stream.binance.com:9443/ws/${streams.join('/')}`);
+  const ws = new WebSocket(`${TESTNET}/${streams.join('/')}`);
   
   ws.onmessage = (event) => {
     try {
@@ -123,3 +128,6 @@ export function connect(callbacks: WebSocketCallbacks): WebSocket {
   
   return ws;
 }
+
+// 导出API功能
+export * from './api';
