@@ -189,6 +189,17 @@ const Main: React.FC = () => {
                       onOrderCreated={handleOrderCreated}
                       balance={usdtBalance}
                       coinBalance={selectedCoinBalance}
+                      currentPrice={(() => {
+                        // 从bookTicker获取当前价格
+                        const tickerData = bookTicker[selectedToken];
+                        if (tickerData && typeof tickerData === 'object') {
+                          const price = tickerData.c || tickerData.lastPrice || tickerData.b || tickerData.a;
+                          if (price) {
+                            return parseFloat(price);
+                          }
+                        }
+                        return 0;
+                      })()}
                     />
                   </Card>
                 </div>

@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, Input, Button, Radio, message, Card, Typography } from 'antd';
 import { createOrder, OrderSide, OrderType, TimeInForce, type NewOrderParams } from '../adaptor/biance/api';
 import type { token } from './Main';
-import { useBinanceWebSocket } from '../hooks/useBinanceWebSocket';
 
 const { Title, Text } = Typography;
 
@@ -11,33 +10,19 @@ interface TradeFormProps {
   onOrderCreated?: () => void;
   balance?: number;
   coinBalance?: number;
+  currentPrice: number; // 从父组件传入价格
 }
 
 const TradeForm: React.FC<TradeFormProps> = ({ 
   selectedToken, 
   onOrderCreated, 
   balance = 10000, 
-  coinBalance = 10 
+  coinBalance = 10,
+  currentPrice = 0
 }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [currentPrice, setCurrentPrice] = useState(0);
   const [quantityPercentage, setQuantityPercentage] = useState(0);
-  
-  const { bookTicker } = useBinanceWebSocket();
-  
-  // 获取实时价格
-  useEffect(() => {
-    if (bookTicker && bookTicker[selectedToken]) {
-      const tickerData = bookTicker[selectedToken];
-      if (tickerData && typeof tickerData === 'object') {
-        const price = tickerData.c || tickerData.lastPrice || tickerData.b || tickerData.a;
-        if (price) {
-          setCurrentPrice(parseFloat(price));
-        }
-      }
-    }
-  }, [bookTicker, selectedToken]);
   
 
   
@@ -205,7 +190,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
       </div>
       
       {/* 下划线切换按钮 */}
-      <div style={{ marginBottom: 20 }}>
+      <div >
         <div style={{ display: 'flex', width: '100%' }}>
           <div
             style={{
@@ -281,15 +266,15 @@ const TradeForm: React.FC<TradeFormProps> = ({
         }}
       >
         {/* 订单类型 */}
-        <Form.Item label="订单类型" name="orderType" rules={[{ required: true }]}>
+        {/* <Form.Item label="订单类型" name="orderType" rules={[{ required: true }]}>
           <Radio.Group buttonStyle="solid" style={{ width: '100%' }}>
             <Radio.Button value="MARKET" style={{ flex: 1 }}>市价单</Radio.Button>
             <Radio.Button value="LIMIT" style={{ flex: 1 }}>限价单</Radio.Button>
           </Radio.Group>
-        </Form.Item>
+        </Form.Item> */}
 
         {/* 价格输入 */}
-        <Form.Item
+        {/* <Form.Item
           shouldUpdate={(prevValues, currentValues) => prevValues.orderType !== currentValues.orderType}
         >
           {({ getFieldValue }) => {
@@ -313,7 +298,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
             }
             return null;
           }}
-        </Form.Item>
+        </Form.Item> */}
 
         {/* 数量输入 */}
         <Form.Item label="数量" name="quantity" rules={[{ required: true }]}>
