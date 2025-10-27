@@ -1,131 +1,313 @@
-import React, { useState } from 'react';
-import { Form, Input, Button, Select, Radio, message, Card, Typography } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Form, Input, Button, Radio, message, Card, Typography } from 'antd';
 import { createOrder, OrderSide, OrderType, TimeInForce, type NewOrderParams } from '../adaptor/biance/api';
 import type { token } from './Main';
+import { useBinanceWebSocket } from '../hooks/useBinanceWebSocket';
 
 const { Title, Text } = Typography;
 
 interface TradeFormProps {
   selectedToken: token;
   onOrderCreated?: () => void;
+  balance?: number;
+  coinBalance?: number;
 }
 
-const TradeForm: React.FC<TradeFormProps> = ({ selectedToken, onOrderCreated }) => {
+const TradeForm: React.FC<TradeFormProps> = ({ 
+  selectedToken, 
+  onOrderCreated, 
+  balance = 10000, 
+  coinBalance = 10 
+}) => {
   const [form] = Form.useForm();
-  const [loading, setLoading] = useState<boolean>(false);
-
-  // 处理订单提交
+  const [loading, setLoading] = useState(false);
+  const [currentPrice, setCurrentPrice] = useState(0);
+  const [quantityPercentage, setQuantityPercentage] = useState(0);
+  
+  const { bookTicker } = useBinanceWebSocket();
+  
+  // 获取实时价格
+  useEffect(() => {
+    if (bookTicker && bookTicker[selectedToken]) {
+      const tickerData = bookTicker[selectedToken];
+      if (tickerData && typeof tickerData === 'object') {
+        const price = tickerData.c || tickerData.lastPrice || tickerData.b || tickerData.a;
+        if (price) {
+          setCurrentPrice(parseFloat(price));
+        }
+      }
+    }
+  }, [bookTicker, selectedToken]);
+  
+  // 快捷数量选择
+  const quickSelectQuantity = (percentage: number) => {
+    const side = form.getFieldValue('side');
+    const price = currentPrice || 1;
+    let quantity = 0;
+    
+    if (side === 'BUY') {
+      quantity = (balance * percentage / 100) / price;
+    } else {
+      quantity = (coinBalance * percentage / 100);
+    }
+    
+    const precision = selectedToken.includes('BTC') ? 6 : 4;
+    form.setFieldValue('quantity', quantity.toFixed(precision));
+    setQuantityPercentage(percentage);
+  };
+  
+  // 处理数量变化，更新百分比
+  const handleQuantityChange = (value: string) => {
+    const side = form.getFieldValue('side');
+    const quantity = parseFloat(value) || 0;
+    const price = currentPrice || 1;
+    
+    let maxQuantity = 0;
+    if (side === 'BUY') {
+      maxQuantity = balance / price;
+    } else {
+      maxQuantity = coinBalance;
+    }
+    
+    if (maxQuantity > 0) {
+      const percentage = (quantity / maxQuantity) * 100;
+      // 检查是否接近预设百分比
+      if (Math.abs(percentage - 25) < 1) setQuantityPercentage(25);
+      else if (Math.abs(percentage - 50) < 1) setQuantityPercentage(50);
+      else if (Math.abs(percentage - 75) < 1) setQuantityPercentage(75);
+      else if (Math.abs(percentage - 100) < 1) setQuantityPercentage(100);
+      else setQuantityPercentage(Math.round(percentage));
+    }
+  };
+  
+  // 计算投入金额
+  const calculateInvestment = () => {
+    const quantity = parseFloat(form.getFieldValue('quantity') || '0');
+    return quantity * (form.getFieldValue('price') || currentPrice || 1);
+  };
+  
+  // 切换买卖方向
+  const handleSideChange = (newSide: string) => {
+    console.log('切换买卖方向:', newSide);
+    // 不再依赖表单中的side字段
+    setQuantityPercentage(0);
+    form.setFieldValue('quantity', '');
+  };
+  
+  // 提交订单
   const handleSubmit = async (values: any) => {
     setLoading(true);
     
     try {
-      // 构建订单参数
+      console.log('开始处理订单提交...');
+      
+      // 1. 获取和验证交易参数
+      const quantity = parseFloat(values.quantity);
+      const orderPrice = values.orderType === 'LIMIT' ? parseFloat(values.price) : currentPrice;
+      
+      console.log('交易参数:', {
+        symbol: selectedToken,
+        side: values.side,
+        type: values.orderType,
+        quantity: quantity,
+        price: orderPrice
+      });
+      
+      // 2. 检查余额是否充足
+      if (values.side === 'BUY') {
+        const requiredAmount = quantity * orderPrice;
+        console.log('买入所需USDT:', requiredAmount, '可用余额:', balance);
+        if (requiredAmount > balance) {
+          message.error('USDT余额不足，请减少购买数量');
+          return;
+        }
+      } else {
+        console.log('卖出数量:', quantity, '可用余额:', coinBalance);
+        if (quantity > coinBalance) {
+          message.error(`${coinSymbol}余额不足，请减少卖出数量`);
+          return;
+        }
+      }
+      
+      // 3. 构建订单参数对象
+      console.log('当前用户选择的交易方向:', side);
+      
+      // 完全基于UI上显示的交易方向构建订单参数
+      const orderSide = side === 'BUY' ? OrderSide.BUY : OrderSide.SELL;
+      
       const orderParams: NewOrderParams = {
         symbol: selectedToken,
-        side: values.side === 'BUY' ? OrderSide.BUY : OrderSide.SELL,
+        side: orderSide,
         type: values.orderType === 'LIMIT' ? OrderType.LIMIT : OrderType.MARKET,
         quantity: values.quantity
       };
+      
+      // 重要：记录最终发送到API的订单参数
+      console.log('最终发送到API的订单参数:', JSON.stringify(orderParams));
 
-      // 限价单需要价格和有效期
+      // 4. 添加限价单特有的参数
       if (values.orderType === 'LIMIT') {
         orderParams.price = values.price;
         orderParams.timeInForce = TimeInForce.GTC;
+        console.log('限价单参数已添加');
       }
 
-      // 提交订单
-      const result = await createOrder(orderParams);
+      // 5. 调用下单接口
+      console.log('调用createOrder接口...');
+      const orderResult = await createOrder(orderParams);
+      console.log('订单创建成功:', orderResult);
       
-      // 显示成功消息
-      message.success(`订单创建成功！订单ID: ${result.orderId}`);
+      // 6. 处理成功响应
+      message.success(`订单创建成功！订单ID: ${orderResult?.orderId || 'N/A'}`);
       
-      // 通知父组件订单已创建，用于刷新其他组件
+      // 7. 通知父组件订单已创建
       if (onOrderCreated) {
+        console.log('通知父组件订单已创建');
         onOrderCreated();
       }
       
-      // 重置表单
+      // 8. 重置表单
       form.resetFields();
+      setQuantityPercentage(0);
+      console.log('表单已重置');
       
-      return result;
     } catch (error: any) {
-      // 显示错误消息
-      message.error(`订单创建失败: ${error.message}`);
-      throw error;
+      // 9. 处理错误
+      console.error('下单失败:', error);
+      message.error(`订单创建失败: ${error.message || '未知错误'}`);
     } finally {
+      // 10. 无论成功失败，都设置loading为false
       setLoading(false);
+      console.log('订单处理完成');
     }
   };
 
-  // 当选中的交易对变化时，重置表单
-  React.useEffect(() => {
+  // 重置表单
+  useEffect(() => {
     form.resetFields();
+    setQuantityPercentage(0);
   }, [selectedToken, form]);
 
+  const coinSymbol = selectedToken.split('USDT')[0];
+  const side = form.getFieldValue('side') || 'BUY';
+
   return (
-    <Card className="trade-form" variant="outlined">
+    <Card className="trade-form" variant="outlined" style={{ borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+      {/* 交易对和价格 */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+        <Title level={4} style={{ margin: 0 }}>{coinSymbol}/USDT</Title>
+        <div style={{ textAlign: 'right' }}>
+          <Text style={{ fontSize: 14, color: '#8c8c8c' }}>最新价格</Text>
+          <div style={{ fontSize: 20, fontWeight: 'bold', color: currentPrice > 0 ? '#1976d2' : '#8c8c8c' }}>
+            {currentPrice > 0 ? currentPrice.toFixed(2) : '--'} USDT
+          </div>
+        </div>
+      </div>
+      
+      {/* 下划线切换按钮 */}
+      <div style={{ marginBottom: 20 }}>
+        <div style={{ display: 'flex', width: '100%' }}>
+          <div
+            style={{
+              flex: 1,
+              textAlign: 'center',
+              padding: '10px 0',
+              cursor: 'pointer',
+              fontSize: 16,
+              fontWeight: 'bold',
+              color: side === 'BUY' ? '#52c41a' : '#8c8c8c',
+              borderBottom: side === 'BUY' ? '3px solid #52c41a' : 'none'
+            }}
+            onClick={() => handleSideChange('BUY')}
+          >
+            买入
+          </div>
+          <div
+            style={{
+              flex: 1,
+              textAlign: 'center',
+              padding: '10px 0',
+              cursor: 'pointer',
+              fontSize: 16,
+              fontWeight: 'bold',
+              color: side === 'SELL' ? '#f5222d' : '#8c8c8c',
+              borderBottom: side === 'SELL' ? '3px solid #f5222d' : 'none'
+            }}
+            onClick={() => handleSideChange('SELL')}
+          >
+            卖出
+          </div>
+        </div>
+        
+        {/* 余额显示 */}
+        <div style={{ textAlign: 'right', marginTop: 8, fontSize: 14 }}>
+          {side === 'BUY' ? (
+            <>
+              <Text style={{ color: '#8c8c8c' }}>可用 USDT: </Text>
+              <Text style={{ color: '#52c41a', fontWeight: 'bold' }}>{balance.toFixed(2)}</Text>
+              {currentPrice > 0 && (
+                <>
+                  <Text style={{ color: '#8c8c8c', marginLeft: 10 }}>最大可买: </Text>
+                  <Text style={{ color: '#1976d2', fontWeight: 'bold' }}>
+                    {(balance / currentPrice).toFixed(6)}
+                  </Text>
+                  <Text style={{ color: '#8c8c8c' }}> {coinSymbol}</Text>
+                </>
+              )}
+            </>
+          ) : (
+            <>
+              <Text style={{ color: '#8c8c8c' }}>可用 {coinSymbol}: </Text>
+              <Text style={{ color: '#52c41a', fontWeight: 'bold' }}>{coinBalance.toFixed(6)}</Text>
+              {currentPrice > 0 && (
+                <>
+                  <Text style={{ color: '#8c8c8c', marginLeft: 10 }}>可卖 USDT: </Text>
+                  <Text style={{ color: '#1976d2', fontWeight: 'bold' }}>
+                    {(coinBalance * currentPrice).toFixed(2)}
+                  </Text>
+                </>
+              )}
+            </>
+          )}
+        </div>
+      </div>
+      
       <Form
         form={form}
         layout="vertical"
-        onFinish={handleSubmit}
         initialValues={{
-          orderType: 'MARKET',
-          side: 'BUY',
-          symbol: selectedToken
+          orderType: 'MARKET'
+          // 移除side的初始化，避免可能的冲突
         }}
       >
-        {/* 交易对信息 */}
-        <Form.Item label="交易对" name="symbol">
-          <Select
-            disabled
-            options={[
-              { value: 'ETHUSDT', label: 'ETH/USDT' },
-              { value: 'BTCUSDT', label: 'BTC/USDT' },
-              { value: 'SOLUSDT', label: 'SOL/USDT' }
-            ]}
-          />
-        </Form.Item>
-
-        {/* 交易方向 */}
-        <Form.Item label="交易方向" name="side" rules={[{ required: true, message: '请选择交易方向' }]}>
-          <Radio.Group>
-            <Radio.Button value="BUY" style={{ color: 'green' }}>买入</Radio.Button>
-            <Radio.Button value="SELL" style={{ color: 'red' }}>卖出</Radio.Button>
-          </Radio.Group>
-        </Form.Item>
-
         {/* 订单类型 */}
-        <Form.Item label="订单类型" name="orderType" rules={[{ required: true, message: '请选择订单类型' }]}>
-          <Radio.Group>
-            <Radio.Button value="MARKET">市价单</Radio.Button>
-            <Radio.Button value="LIMIT">限价单</Radio.Button>
+        <Form.Item label="订单类型" name="orderType" rules={[{ required: true }]}>
+          <Radio.Group buttonStyle="solid" style={{ width: '100%' }}>
+            <Radio.Button value="MARKET" style={{ flex: 1 }}>市价单</Radio.Button>
+            <Radio.Button value="LIMIT" style={{ flex: 1 }}>限价单</Radio.Button>
           </Radio.Group>
         </Form.Item>
 
-        {/* 价格（仅限价单需要） */}
+        {/* 价格输入 */}
         <Form.Item
           shouldUpdate={(prevValues, currentValues) => prevValues.orderType !== currentValues.orderType}
         >
           {({ getFieldValue }) => {
-            // 只在限价单模式下显示价格输入
             if (getFieldValue('orderType') === 'LIMIT') {
               return (
-                <Form.Item
-                  label="价格"
-                  name="price"
-                  rules={[
-                    { required: true, message: '请输入价格' }
-                  ]}
-                >
+                <Form.Item label="价格" name="price" rules={[{ required: true }]}>
                   <Input
                     placeholder="请输入价格"
                     type="number"
                     min={0}
                     step="any"
+                    style={{ borderRadius: 4, height: 44, fontSize: 16 }}
                   />
-                  <Text type="secondary" style={{ marginTop: '4px', display: 'block' }}>
-                    限价单需要指定价格，市价单将使用当前市场价格
-                  </Text>
+                  {currentPrice > 0 && (
+                    <Text type="secondary" style={{ marginTop: '4px', display: 'block' }}>
+                      当前市场价格: {currentPrice.toFixed(2)} USDT
+                    </Text>
+                  )}
                 </Form.Item>
               );
             }
@@ -133,37 +315,105 @@ const TradeForm: React.FC<TradeFormProps> = ({ selectedToken, onOrderCreated }) 
           }}
         </Form.Item>
 
-        {/* 数量 */}
-        <Form.Item
-          label="数量"
-          name="quantity"
-          rules={[
-            { required: true, message: '请输入数量' }, 
-            {
-              validator: (_, value) => {
-                // 确保value是数字且大于0
-                const numValue = parseFloat(value);
-                if (isNaN(numValue) || numValue <= 0) {
-                  return Promise.reject(new Error('数量必须大于0'));
+        {/* 数量输入 */}
+        <Form.Item label="数量" name="quantity" rules={[{ required: true }]}>
+          <div>
+            <Input 
+              placeholder={`请输入${coinSymbol}数量`} 
+              type="number" 
+              min="0.00000001" 
+              step="any"
+              style={{ borderRadius: 4, height: 44, fontSize: 16 }}
+              onChange={(e) => {
+                form.setFieldValue('quantity', e.target.value);
+                handleQuantityChange(e.target.value);
+              }}
+            />
+            
+            {/* 快捷百分比按钮 */}
+            <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+              {[25, 50, 75, 100].map((percent) => (
+                <Button 
+                  key={percent}
+                  size="small" 
+                  onClick={() => quickSelectQuantity(percent)}
+                  style={{
+                    flex: 1,
+                    backgroundColor: quantityPercentage === percent ? '#1890ff' : 'transparent',
+                    borderColor: quantityPercentage === percent ? '#1890ff' : '#d9d9d9',
+                    color: quantityPercentage === percent ? 'white' : '#333'
+                  }}
+                  disabled={loading}
+                >
+                  {percent}%
+                </Button>
+              ))}
+            </div>
+            
+            {/* 交易信息 */}
+            <div style={{ marginTop: '4px', fontSize: 12, color: '#8c8c8c' }}>
+              当前选择: {quantityPercentage}%
+            </div>
+            
+            {form.getFieldValue('quantity') && (
+              <div style={{ marginTop: '4px', fontSize: 12, color: '#1890ff' }}>
+                {side === 'BUY' ? 
+                  `投入 $${calculateInvestment().toFixed(2)} (${quantityPercentage}% 余额)` : 
+                  `卖出 ${form.getFieldValue('quantity')} ${coinSymbol} 可获得 $${calculateInvestment().toFixed(2)}`
                 }
-                return Promise.resolve();
-              }
-            }
-          ]}
-        >
-          <Input placeholder="请输入交易数量" type="number" min="0.00000001" step="any" />
+              </div>
+            )}
+          </div>
         </Form.Item>
 
-        {/* 操作按钮 */}
-        <Form.Item>
-          <div style={{ display: 'flex', gap: '16px' }}>
-            <Button type="primary" htmlType="submit" loading={loading} style={{ flex: 1 }}>
-              {form.getFieldValue('side') === 'BUY' ? (loading ? '买入中...' : '买入') : (loading ? '卖出中...' : '卖出')}
-            </Button>
-            <Button onClick={() => form.resetFields()} disabled={loading}>
-              重置
-            </Button>
+        {/* 订单摘要 */}
+        <div style={{ padding: '12px', backgroundColor: '#f5f5f5', borderRadius: 4, marginBottom: 16 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14 }}>
+            <Text style={{ color: '#8c8c8c' }}>
+              {side === 'BUY' ? '预计总价:' : '预计获得:'}
+            </Text>
+            <Text style={{ fontWeight: 'bold', color: '#1976d2' }}>
+              {calculateInvestment().toFixed(2)} USDT
+            </Text>
           </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, marginTop: 4 }}>
+            <Text style={{ color: '#8c8c8c' }}>可用余额:</Text>
+            <Text style={{ color: '#52c41a' }}>
+              {side === 'BUY' ? `${balance.toFixed(2)} USDT` : `${coinBalance.toFixed(6)} ${coinSymbol}`}
+            </Text>
+          </div>
+        </div>
+        
+        {/* 提交按钮 */}
+        <Form.Item>
+          <Button 
+            type="primary" 
+            loading={loading}
+            onClick={() => {
+              console.log("按钮点击时，当前显示的交易方向:", side);
+              
+              form.validateFields().then(values => {
+                console.log('表单验证通过，values:', values);
+                // 直接调用handleSubmit，不再传递可能有问题的values.side
+                handleSubmit(values);
+              }).catch(info => {
+                console.log('表单验证失败:', info);
+              });
+            }}
+            style={{
+              width: '100%',
+              height: 48,
+              fontSize: 16,
+              fontWeight: 'bold',
+              backgroundColor: side === 'BUY' ? '#52c41a' : '#f5222d',
+              borderColor: side === 'BUY' ? '#52c41a' : '#f5222d'
+            }}
+          >
+            {loading ? 
+              (side === 'BUY' ? '买入中...' : '卖出中...') : 
+              `${side === 'BUY' ? '买入' : '卖出'} ${coinSymbol}`
+            }
+          </Button>
         </Form.Item>
       </Form>
     </Card>

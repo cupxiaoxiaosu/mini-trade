@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useBinanceWebSocket } from '../hooks/useBinanceWebSocket';
 type token = 'ETHUSDT' | 'BTCUSDT' | 'SOLUSDT';
 import OrderBook from './OrderBook';
@@ -9,12 +9,45 @@ import HistoricalOrders from './HistoricalOrders';
 import TradeForm from './TradeForm';
 import { Select, Button, Badge, Tabs, Row, Col, Layout, Card, Typography } from 'antd';
 import { CaretRightOutlined, CloseOutlined, BarChartOutlined, WalletOutlined, FileTextOutlined } from '@ant-design/icons';
+import { binanceApi } from '../adaptor/biance/api';
 
 const { Header, Content, Sider } = Layout;
 const { Title } = Typography;
 const Main: React.FC = () => {
   const { isConnected, connect, disconnect, error, trade, kline, bookTicker } = useBinanceWebSocket();
   const [selectedToken, setSelectedToken] = useState<token>('ETHUSDT');
+  const [usdtBalance, setUsdtBalance] = useState<number>(10000);
+  const [selectedCoinBalance, setSelectedCoinBalance] = useState<number>(10);
+  
+  // 获取真实余额数据
+  const fetchBalances = async () => {
+    try {
+      const accountInfo = await binanceApi.getAccountInfo();
+      const specificSymbols = ['USDT', 'SOL', 'ETH', 'BTC'];
+      const balances = binanceApi.extractBalances(accountInfo, specificSymbols);
+      
+      // 获取USDT余额
+      const usdt = balances.find(b => b.asset === 'USDT');
+      if (usdt) {
+        setUsdtBalance(parseFloat(usdt.free));
+      }
+      
+      // 获取选中币种的余额
+      const coinSymbol = selectedToken.split('USDT')[0];
+      const coin = balances.find(b => b.asset === coinSymbol);
+      if (coin) {
+        setSelectedCoinBalance(parseFloat(coin.free));
+      }
+    } catch (err) {
+      console.error('获取余额失败:', err);
+      // 保留默认值
+    }
+  };
+  
+  // 当选中币种变化时，获取对应币种的余额
+  useEffect(() => {
+    fetchBalances();
+  }, [selectedToken, isConnected]);
 
   
   
@@ -29,6 +62,8 @@ const Main: React.FC = () => {
   const handleOrderCreated = () => {
     // 触发刷新，通过改变key强制重新渲染组件
     setRefreshKey(prev => prev + 1);
+    // 订单创建后刷新余额数据
+    fetchBalances();
   };
 
   return (
@@ -149,7 +184,12 @@ const Main: React.FC = () => {
                     <Balance key={`balance-${refreshKey}`} />
                   </Card>
                   <Card className="exchange-card" variant="outlined" style={{ marginTop: '16px' }}>
-                    <TradeForm selectedToken={selectedToken} onOrderCreated={handleOrderCreated} />
+                    <TradeForm 
+                      selectedToken={selectedToken} 
+                      onOrderCreated={handleOrderCreated}
+                      balance={usdtBalance}
+                      coinBalance={selectedCoinBalance}
+                    />
                   </Card>
                 </div>
               ),
