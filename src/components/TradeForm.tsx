@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Form, Input, Button, Radio, message, Card, Typography } from 'antd';
 import { createOrder, OrderSide, OrderType, TimeInForce, type NewOrderParams } from '../adaptor/biance/api';
 import type { token } from './Main';
@@ -39,21 +39,20 @@ const TradeForm: React.FC<TradeFormProps> = ({
     }
   }, [bookTicker, selectedToken]);
   
-  // 快捷数量选择
+
+  
+  const quantity = form.getFieldValue('side') === 'BUY' ? (balance * quantityPercentage / 100) / currentPrice : (coinBalance * quantityPercentage / 100);
+
   const quickSelectQuantity = (percentage: number) => {
-    const side = form.getFieldValue('side');
-    const price = currentPrice || 1;
-    let quantity = 0;
-    
-    if (side === 'BUY') {
-      quantity = (balance * percentage / 100) / price;
-    } else {
-      quantity = (coinBalance * percentage / 100);
-    }
-    
     const precision = selectedToken.includes('BTC') ? 6 : 4;
-    form.setFieldValue('quantity', quantity.toFixed(precision));
+    const quantityStr = quantity.toFixed(precision);
+    // 确保数量值立即更新到表单中
+    form.setFieldsValue({ quantity: quantityStr });
+    
+    // 同时更新百分比状态
     setQuantityPercentage(percentage);
+    
+    console.log(`已选择${percentage}%，数量设置为: ${quantityStr}`);
   };
   
   // 处理数量变化，更新百分比
@@ -79,7 +78,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
       else setQuantityPercentage(Math.round(percentage));
     }
   };
-  
+
   // 计算投入金额
   const calculateInvestment = () => {
     const quantity = parseFloat(form.getFieldValue('quantity') || '0');
@@ -89,7 +88,8 @@ const TradeForm: React.FC<TradeFormProps> = ({
   // 切换买卖方向
   const handleSideChange = (newSide: string) => {
     console.log('切换买卖方向:', newSide);
-    // 不再依赖表单中的side字段
+    // 更新表单中的side字段
+    form.setFieldValue('side', newSide);
     setQuantityPercentage(0);
     form.setFieldValue('quantity', '');
   };
@@ -324,6 +324,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
               min="0.00000001" 
               step="any"
               style={{ borderRadius: 4, height: 44, fontSize: 16 }}
+              value={quantity}
               onChange={(e) => {
                 form.setFieldValue('quantity', e.target.value);
                 handleQuantityChange(e.target.value);
