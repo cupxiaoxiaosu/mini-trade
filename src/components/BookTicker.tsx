@@ -10,21 +10,10 @@ interface BookTickerProps {
 
 const BookTicker: React.FC<BookTickerProps> = ({ data, token }) => {
   return (
-    <Card 
-      title={`${token} 买卖盘数据`} 
-      bordered={true}
-      className="financial-card"
-      size="small"
-      style={{
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.08)',
-        borderRadius: '8px',
-        backgroundColor: '#fff'
-      }}
-    >
-      {data ? (
+    <div>  {data ? (
         <Row gutter={[16, 16]} justify="center">
           <Col xs={12} sm={6}>
-            <Card size="small" title="买一价 (b)" bordered={false}>
+            <Card size="small" title="买一价 (b)" variant="outlined">
               <Statistic 
                 value={parseFloat(data.b || '0')} 
                 precision={8}
@@ -33,7 +22,7 @@ const BookTicker: React.FC<BookTickerProps> = ({ data, token }) => {
             </Card>
           </Col>
           <Col xs={12} sm={6}>
-            <Card size="small" title="买一量 (B)" bordered={false}>
+            <Card size="small" title="买一量 (B)" variant="outlined">
               <Statistic 
                 value={parseFloat(data.B || '0')} 
                 precision={8}
@@ -42,7 +31,7 @@ const BookTicker: React.FC<BookTickerProps> = ({ data, token }) => {
             </Card>
           </Col>
           <Col xs={12} sm={6}>
-            <Card size="small" title="卖一价 (a)" bordered={false}>
+            <Card size="small" title="卖一价 (a)" variant="outlined">
               <Statistic 
                 value={parseFloat(data.a || '0')} 
                 precision={8}
@@ -51,7 +40,7 @@ const BookTicker: React.FC<BookTickerProps> = ({ data, token }) => {
             </Card>
           </Col>
           <Col xs={12} sm={6}>
-            <Card size="small" title="卖一量 (A)" bordered={false}>
+            <Card size="small" title="卖一量 (A)" variant="outlined">
               <Statistic 
                 value={parseFloat(data.A || '0')} 
                 precision={8}
@@ -65,7 +54,7 @@ const BookTicker: React.FC<BookTickerProps> = ({ data, token }) => {
           暂无买卖盘数据
         </div>
       )}
-    </Card>
+    </div>
   );
 };
 

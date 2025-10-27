@@ -80,18 +80,15 @@ export const OrderBook: React.FC<OrderBookProps> = ({ data, token }) => {
   ];
 
   return (
-    <div style={{ width: '100%', padding: '20px' }}>
-      <h2 style={{ marginBottom: '20px' }}>最近交易记录</h2>
-      <Table
-        columns={columns}
-        dataSource={data}
-        rowKey={(record) => `${record.t}`}
-        pagination={false}
-        scroll={{ x: 1200 }}
-        size="small"
-        bordered
-      />
-    </div>
+    <Table
+      columns={columns}
+      dataSource={data}
+      rowKey={(record) => `${record.t}`}
+      pagination={false}
+      scroll={{ x: 1200 }}
+      size="small"
+      bordered
+    />
   );
 };
 

@@ -115,27 +115,24 @@ const HistoricalOrders: React.FC = () => {
 
   return (
     <div className="historical-orders">
-      <div className="historical-orders-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-        <h3>历史订单</h3>
-        <div className="order-controls" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <div>
-            <label style={{ marginRight: '8px' }}>显示数量:</label>
-            <Select
-              value={limit}
-              onChange={(value) => setLimit(value)}
-              style={{ width: 100 }}
-              options={[
-                { value: 10, label: '10' },
-                { value: 20, label: '20' },
-                { value: 50, label: '50' },
-                { value: 100, label: '100' },
-              ]}
-            />
-          </div>
-          <Button type="primary" onClick={fetchHistoricalOrders} loading={loading}>
-            刷新
-          </Button>
+      <div className="order-controls" style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '16px', marginBottom: '8px' }}>
+        <div>
+          <label style={{ marginRight: '8px' }}>显示数量:</label>
+          <Select
+            value={limit}
+            onChange={(value) => setLimit(value)}
+            style={{ width: 100 }}
+            options={[
+              { value: 10, label: '10' },
+              { value: 20, label: '20' },
+              { value: 50, label: '50' },
+              { value: 100, label: '100' },
+            ]}
+          />
         </div>
+        <Button type="primary" onClick={fetchHistoricalOrders} loading={loading}>
+          刷新
+        </Button>
       </div>
       
       {loading && (

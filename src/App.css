@@ -1,49 +1,7 @@
+/* 交易所风格样式 */
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-}
-
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
-}
-
-/* 全局样式重置 */
-* {
-  box-sizing: border-box;
+  width: 100%;
+  height: 100vh;
   margin: 0;
   padding: 0;
 }
@@ -54,41 +12,142 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #f5f5f5;
-  color: #333;
+  background-color: #141414;
+  color: #eaeaea;
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  overflow-x: hidden;
+}
+
+/* 全局样式重置 */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 .app {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  height: 100vh;
+  overflow: hidden;
 }
 
-.app-header {
-  background-color: #282c34;
-  padding: 1rem 2rem;
-  color: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+/* 交易所布局样式 */
+.exchange-layout {
+  height: 100vh;
+  background-color: #141414;
 }
 
-.app-header h1 {
-  font-size: 1.8rem;
-  margin: 0;
+.exchange-header {
+  background-color: #0a0a0a;
+  padding: 0 24px;
+  height: 64px;
+  line-height: 64px;
+  border-bottom: 1px solid #333;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
 }
 
-.app-main {
-  flex: 1;
-  padding: 1rem;
-  max-width: 1200px;
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+  max-width: 1600px;
   margin: 0 auto;
-  width: 100%;
 }
 
-.content-section {
-  background-color: white;
+.header-left {
+  display: flex;
+  align-items: center;
+}
+
+.exchange-title {
+  color: #ffffff;
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.exchange-content {
+  padding: 20px;
+  overflow: auto;
+  background-color: #141414;
+  height: calc(100vh - 64px);
+}
+
+/* 卡片样式 */
+.exchange-card {
+  background-color: #1e1e1e;
+  border: 1px solid #333;
   border-radius: 8px;
-  padding: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.exchange-card .ant-card-head {
+  background-color: #252525;
+  border-bottom: 1px solid #333;
+}
+
+.exchange-card .ant-card-head-title {
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.exchange-card .ant-card-body {
+  color: #eaeaea;
+}
+
+/* Tabs样式 */
+.exchange-tabs .ant-tabs-tab {
+  color: #999;
+  font-weight: 500;
+}
+
+.exchange-tabs .ant-tabs-tab-active {
+  color: #ffffff;
+}
+
+.exchange-tabs .ant-tabs-ink-bar {
+  background-color: #2196f3;
+}
+
+.exchange-tabs .ant-tabs-content {
+  background-color: #141414;
+  padding-top: 16px;
+}
+
+/* 交易页面样式 */
+.trade-page,
+.orders-page,
+.funds-page {
+  background-color: #141414;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .exchange-header {
+    padding: 0 16px;
+  }
+  
+  .exchange-title {
+    font-size: 16px;
+  }
+  
+  .main-controls {
+    flex-direction: column;
+    gap: 10px;
+    margin-left: 15px !important;
+  }
+  
+  .symbol-selector {
+    margin-bottom: 8px;
+  }
+  
+  .exchange-content {
+    padding: 12px;
+  }
 }
 
 /* OrderBook 组件样式 */
@@ -102,7 +161,7 @@ body {
   align-items: center;
   margin-bottom: 1rem;
   padding-bottom: 0.5rem;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid #333;
 }
 
 .header-left {
@@ -113,7 +172,7 @@ body {
 
 .header-left h3 {
   font-size: 1.2rem;
-  color: #333;
+  color: #ffffff;
 }
 
 .symbol-selector {
@@ -124,9 +183,11 @@ body {
 
 .symbol-selector select {
   padding: 0.3rem 0.6rem;
-  border: 1px solid #ccc;
+  border: 1px solid #444;
   border-radius: 4px;
   font-size: 0.9rem;
+  background-color: #252525;
+  color: #eaeaea;
 }
 
 .connection-status {
@@ -134,6 +195,7 @@ body {
   align-items: center;
   gap: 0.5rem;
   font-size: 0.9rem;
+  color: #eaeaea;
 }
 
 .status-indicator {
@@ -154,9 +216,10 @@ body {
 .last-price {
   margin-bottom: 1rem;
   padding: 0.5rem;
-  background-color: #f8f9fa;
+  background-color: #1e1e1e;
   border-radius: 4px;
   font-size: 1rem;
+  color: #eaeaea;
 }
 
 .last-price strong {
@@ -166,11 +229,12 @@ body {
 
 .error-message {
   color: #f44336;
-  background-color: #ffebee;
+  background-color: rgba(244, 67, 54, 0.1);
   padding: 0.5rem;
   border-radius: 4px;
   margin-bottom: 1rem;
   font-size: 0.9rem;
+  border: 1px solid rgba(244, 67, 54, 0.3);
 }
 
 .controls {
@@ -198,43 +262,13 @@ body {
 }
 
 .controls button:disabled {
-  background-color: #e0e0e0;
+  background-color: #444;
   color: #9e9e9e;
   cursor: not-allowed;
 }
 
 /* 响应式设计 */
 @media (max-width: 768px) {
-  .app-header {
-    padding: 0.8rem 1rem;
-  }
-  
-  .app-header h1 {
-    font-size: 1.5rem;
-  }
-  
-  .app-main {
-    padding: 0.8rem;
-  }
-  
-  .order-book-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 1rem;
-  }
-  
-  .header-left {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.5rem;
-    width: 100%;
-  }
-  
-  .symbol-selector {
-    width: 100%;
-  }
-  
-  .symbol-selector select {
-    flex: 1;
-  }
+  /* 保留之前的响应式设计，避免冲突 */
+  /* 响应式样式已经在文件开头的交易所风格样式部分定义 */
 }

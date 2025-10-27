@@ -3,7 +3,7 @@ import { API_KEY, API_SECRET } from './config';
 import querystring from 'querystring';
 
 // API基础配置
-const TESTNET_BASE_URL = 'http://localhost:5174'; // 使用本地开发服务器地址
+const TESTNET_BASE_URL = ''; // 使用本地开发服务器地址
 const API_VERSION = 'v3';
 
 // 公共请求参数接口

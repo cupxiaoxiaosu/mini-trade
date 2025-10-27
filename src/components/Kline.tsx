@@ -32,7 +32,6 @@ export const Kline: React.FC<KlineProps> = ({ token }) => {
 
   return (
     <div style={{ height: '500px', width: '100%' }}>
-      <h3 style={{ marginBottom: '16px' }}>{token} K线图</h3>
       <AdvancedRealTimeChart
         symbol={token}
         theme="light"

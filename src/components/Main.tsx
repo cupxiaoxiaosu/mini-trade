@@ -7,10 +7,11 @@ import BookTicker from './BookTicker';
 import Balance from './Balance';
 import HistoricalOrders from './HistoricalOrders';
 import TradeForm from './TradeForm';
-import { Select, Button, Badge, Tabs } from 'antd';
-import { CaretRightOutlined, CloseOutlined } from '@ant-design/icons';
+import { Select, Button, Badge, Tabs, Row, Col, Layout, Card, Typography } from 'antd';
+import { CaretRightOutlined, CloseOutlined, BarChartOutlined, WalletOutlined, FileTextOutlined } from '@ant-design/icons';
 
-import './OrderBook.css';
+const { Header, Content, Sider } = Layout;
+const { Title } = Typography;
 const Main: React.FC = () => {
   const { isConnected, connect, disconnect, error, trade, kline, bookTicker } = useBinanceWebSocket();
   const [selectedToken, setSelectedToken] = useState<token>('ETHUSDT');
@@ -31,79 +32,132 @@ const Main: React.FC = () => {
   };
 
   return (
-    <div className="order-book">
-      <Balance key={`balance-${refreshKey}`} />  
-        <div className="connection-status" style={{ marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-          <Badge 
-            status={isConnected ? 'success' : 'error'} 
-            text={isConnected ? '已连接' : '未连接'} 
-          />
-          <div className="connection-controls">
-            <Button 
-              type="primary" 
-              icon={<CaretRightOutlined />} 
-              onClick={() => connect()} 
-              disabled={isConnected}
-              style={{ marginRight: '8px' }}
-            >
-              连接
-            </Button>
-            <Button 
-              danger 
-              icon={<CloseOutlined />} 
-              onClick={() => disconnect()} 
-              disabled={!isConnected}
-            >
-              断开连接
-            </Button>
+    <Layout className="exchange-layout">
+      {/* 顶部导航 */}
+      <Header className="exchange-header">
+        <div className="header-content">
+          <div className="header-left">
+            <div className="main-controls" style={{ display: 'flex', alignItems: 'center', gap: '20px', marginLeft: '30px' }}>
+              <div className="symbol-selector" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ color: 'white' }}>交易对:</span>
+                <Select
+                  value={selectedToken.toLowerCase()}
+                  onChange={handleSymbolChange}
+                  style={{ width: 150, backgroundColor: 'rgba(255,255,255,0.1)', borderColor: 'rgba(255,255,255,0.2)' }}
+                  options={[
+                    { value: 'ethusdt', label: 'ETH/USDT' },
+                    { value: 'btcusdt', label: 'BTC/USDT' },
+                    { value: 'solusdt', label: 'SOL/USDT' }
+                  ]}
+                  placeholder="请选择交易对"
+                  styles={{
+                    popup: {
+                      root: {
+                        backgroundColor: '#1e1e1e',
+                        borderColor: '#333'
+                      }
+                    }
+                  }}
+                />
+              </div>
+              
+              <div className="connection-status" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <Badge 
+                  status={isConnected ? 'success' : 'error'} 
+                  text={<span style={{ color: 'white' }}>{isConnected ? '已连接' : '未连接'}</span>} 
+                />
+                <div className="connection-controls">
+                  <Button 
+                    type="primary" 
+                    icon={<CaretRightOutlined />} 
+                    onClick={() => connect()} 
+                    disabled={isConnected}
+                    style={{ marginRight: '8px' }}
+                  >
+                    连接
+                  </Button>
+                  <Button 
+                    danger 
+                    icon={<CloseOutlined />} 
+                    onClick={() => disconnect()} 
+                    disabled={!isConnected}
+                  >
+                    断开连接
+                  </Button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
+      </Header>
 
+      <Content className="exchange-content">
         {error && (
-          <div className="error-message">
+          <div className="error-message" style={{ marginBottom: '16px' }}>
             错误: {error.message}
           </div>
         )}
-
-        <div className="symbol-selector" style={{ marginBottom: '24px' }}>
-          <label style={{ display: 'block', marginBottom: '8px', fontWeight: 'bold' }}>选择交易对:</label>
-          <Select
-            value={selectedToken.toLowerCase()}
-            onChange={handleSymbolChange}
-            style={{ width: 200 }}
-            options={[
-              { value: 'ethusdt', label: 'ETH/USDT' },
-              { value: 'btcusdt', label: 'BTC/USDT' },
-              { value: 'solusdt', label: 'SOL/USDT' }
-            ]}
-            placeholder="请选择交易对"
-          />
-        </div>
-
-        <div className="trade-data">
-          <h3>行情数据</h3>
-          <BookTicker data={bookTicker[selectedToken]} token={selectedToken} />
-        </div>
-          
-        <div className="trade-data">
-          <h3>K线图</h3>
-          <Kline data={kline[selectedToken]} token={selectedToken} />
-        </div>
-
-        <div className="trade-data">
-          <h3>交易数据</h3>
-          <OrderBook data={trade[selectedToken]} token={selectedToken} />
-        </div>
-
-        <div className="trade-data">
-          <HistoricalOrders key={`orders-${refreshKey}`} />
-        </div>
         
-        <div className="trade-data">
-          <TradeForm selectedToken={selectedToken} onOrderCreated={handleOrderCreated} />
-        </div>
-  
-    </div>
+        <Tabs
+          className="exchange-tabs"
+          defaultActiveKey="trade"
+          items={[
+            {
+              key: 'trade',
+              label: <span><BarChartOutlined /> 交易</span>,
+              children: (
+                <div className="trade-page">
+                  <Row gutter={[16, 16]}>
+                    {/* 左侧订单簿 */}
+                      <Col xs={24} lg={8}>
+                        <OrderBook data={trade[selectedToken]} token={selectedToken} />
+
+                      </Col>
+                       
+                      {/* 中间K线和行情 */}
+                      <Col xs={24} lg={16}>
+                        <Card title="行情数据" className="exchange-card"      variant="outlined">
+                            <BookTicker data={bookTicker[selectedToken]} token={selectedToken} />
+                          </Card>
+                        <Card title="K线图" className="exchange-card" variant="outlined" style={{ marginTop: '16px' }}>
+                          <Kline data={kline[selectedToken]} token={selectedToken} />
+                        </Card>
+                    
+                      </Col>
+                  </Row>
+                  
+
+                </div>
+              ),
+            },
+            {
+              key: 'orders',
+              label: <span><FileTextOutlined /> 订单</span>,
+              children: (
+                  <div className="orders-page">
+                    <Card className="exchange-card" variant="outlined">
+                      <HistoricalOrders key={`orders-${refreshKey}`} />
+                    </Card>
+                </div>
+              ),
+            },
+            {key: 'funds',
+              label: <span><WalletOutlined /> 资金</span>,
+              children: (
+                <div className="funds-page">
+                  <Card className="exchange-card" variant="outlined">
+                    <Balance key={`balance-${refreshKey}`} />
+                  </Card>
+                  <Card className="exchange-card" variant="outlined" style={{ marginTop: '16px' }}>
+                    <TradeForm selectedToken={selectedToken} onOrderCreated={handleOrderCreated} />
+                  </Card>
+                </div>
+              ),
+            },
+          ]}
+        />
+      </Content>
+    </Layout>
   );
 };
 

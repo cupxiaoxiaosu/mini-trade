@@ -63,7 +63,7 @@ const TradeForm: React.FC<TradeFormProps> = ({ selectedToken, onOrderCreated }) 
   }, [selectedToken, form]);
 
   return (
-    <Card title={<Title level={4}>交易表单</Title>} className="trade-form" variant="outlined">
+    <Card className="trade-form" variant="outlined">
       <Form
         form={form}
         layout="vertical"
@@ -104,9 +104,7 @@ const TradeForm: React.FC<TradeFormProps> = ({ selectedToken, onOrderCreated }) 
 
         {/* 价格（仅限价单需要） */}
         <Form.Item
-          label="价格"
-          name="price"
-          noStyle
+          shouldUpdate={(prevValues, currentValues) => prevValues.orderType !== currentValues.orderType}
         >
           {({ getFieldValue }) => {
             // 只在限价单模式下显示价格输入
@@ -114,6 +112,7 @@ const TradeForm: React.FC<TradeFormProps> = ({ selectedToken, onOrderCreated }) 
               return (
                 <Form.Item
                   label="价格"
+                  name="price"
                   rules={[
                     { required: true, message: '请输入价格' }
                   ]}
@@ -159,13 +158,7 @@ const TradeForm: React.FC<TradeFormProps> = ({ selectedToken, onOrderCreated }) 
         <Form.Item>
           <div style={{ display: 'flex', gap: '16px' }}>
             <Button type="primary" htmlType="submit" loading={loading} style={{ flex: 1 }}>
-              {({ getFieldValue }) => {
-                const side = getFieldValue('side');
-                if (loading) {
-                  return side === 'BUY' ? '买入中...' : '卖出中...';
-                }
-                return side === 'BUY' ? '买入' : '卖出';
-              }}
+              {form.getFieldValue('side') === 'BUY' ? (loading ? '买入中...' : '买入') : (loading ? '卖出中...' : '卖出')}
             </Button>
             <Button onClick={() => form.resetFields()} disabled={loading}>
               重置

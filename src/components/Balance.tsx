@@ -48,18 +48,18 @@ const Balance: React.FC = () => {
   };
 
   const getTokenColor = (asset: string): string => {
+    // 老虎证券风格的币种颜色配置
     const colorMap: Record<string, string> = {
-      BTC: '#F7931A',
-      ETH: '#627EEA',
-      USDT: '#26A17B',
-      SOL: '#00FFA3'
+      BTC: '#F7931A',  // 保持原有金色
+      ETH: '#627EEA',  // 保持原有蓝色
+      USDT: '#1976d2', // 更新为老虎证券主色调
+      SOL: '#1565c0'   // 深蓝色调
     };
-    return colorMap[asset] || '#1890FF';
+    return colorMap[asset] || '#1976d2'; // 使用主色调作为默认值
   };
 
   return (
-    <div style={{ padding: '20px' }}>
-      <h2 style={{ marginBottom: '20px' }}>账户余额</h2>
+    <div>
       
       {loading && (
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px', flexDirection: 'column' }}>
@@ -95,9 +95,8 @@ const Balance: React.FC = () => {
       
       {!loading && !error && (
         <>
-          <Card style={{ marginBottom: '20px' }}>
+          <Card style={{ marginBottom: '20px' }} variant="outlined">
             <Statistic
-              title="总资产 (USDT)"
               value={getTotalBalance()}
               precision={2}
               valueStyle={{ color: '#3f8600' }}
@@ -117,14 +116,15 @@ const Balance: React.FC = () => {
                       backgroundColor: `${getTokenColor(balance.asset)}10`,
                       borderLeft: `4px solid ${getTokenColor(balance.asset)}`
                     }}
+                    variant="outlined"
                   >
                     <Statistic
-                      title={balance.asset}
                       value={total}
                       precision={6}
                       valueStyle={{ color: getTokenColor(balance.asset) }}
+                      suffix={balance.asset}
                     />
-                    <div style={{ marginTop: '8px', fontSize: '12px', color: '#666' }}>
+                    <div style={{ marginTop: '8px', fontSize: '12px', color: '#999' }}>
                       <div>可用: {parseFloat(balance.free).toFixed(6)}</div>
                       <div>冻结: {parseFloat(balance.locked).toFixed(6)}</div>
                     </div>
