@@ -23,9 +23,9 @@ const ExchangeHeader: React.FC<ExchangeHeaderProps> = ({
     <Header className="exchange-header">
       <div className="header-content">
         <div className="header-left">
-          <div className="main-controls" style={{ display: 'flex', alignItems: 'center', gap: '20px', marginLeft: '30px' }}>
+          <div className="main-controls" style={{ display: 'flex', gap: '20px' }}>
             <div className="symbol-selector" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <span style={{ color: 'white' }}>{t('main.tradingPair')}:</span>
+              
               <Select
                 value={selectedToken.toLowerCase()}
                 onChange={onSymbolChange}
