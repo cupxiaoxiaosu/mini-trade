@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, Radio, message, Card, Typography } from 'antd';
-import { createOrder, OrderSide, OrderType, TimeInForce, type NewOrderParams } from '../adaptor/biance/api';
-import type { token } from './Main';
+import { Form, Input, Button, message, Typography } from 'antd';
+import { createOrder } from '../adaptor/biance/api';
+import { OrderSide, OrderType, TimeInForce, type NewOrderParams } from '../adaptor/biance/types';
+import type { token } from '../adaptor/biance';
 
 const { Title, Text } = Typography;
 
@@ -177,9 +178,9 @@ const TradeForm: React.FC<TradeFormProps> = ({
   const side = form.getFieldValue('side') || 'BUY';
 
   return (
-    <Card className="trade-form" variant="outlined" style={{ borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+    <>
       {/* 交易对和价格 */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+      {/* <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <Title level={4} style={{ margin: 0 }}>{coinSymbol}/USDT</Title>
         <div style={{ textAlign: 'right' }}>
           <Text style={{ fontSize: 14, color: '#8c8c8c' }}>最新价格</Text>
@@ -187,7 +188,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
             {currentPrice > 0 ? currentPrice.toFixed(2) : '--'} USDT
           </div>
         </div>
-      </div>
+      </div> */}
       
       {/* 下划线切换按钮 */}
       <div >
@@ -402,7 +403,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
           </Button>
         </Form.Item>
       </Form>
-    </Card>
+    </>
   );
 };
 

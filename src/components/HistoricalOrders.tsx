@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Spin, Alert, Empty, Button, Select } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { getHistoricalOrders, type Order } from '../adaptor/biance/api';
+import { getHistoricalOrders, type Order } from '../adaptor/biance';
 
-const HistoricalOrders: React.FC = () => {
+type HistoricalOrdersProps = {
+  symbol?: 'ETHUSDT' | 'BTCUSDT' | 'SOLUSDT';
+};
+
+const HistoricalOrders: React.FC<HistoricalOrdersProps> = ({ symbol }) => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -15,15 +19,19 @@ const HistoricalOrders: React.FC = () => {
     setError(null);
     
     try {
-      // 支持的交易对列表
-      const tokens: ('ETHUSDT' | 'BTCUSDT' | 'SOLUSDT')[] = ['ETHUSDT', 'BTCUSDT', 'SOLUSDT'];
+      let allOrders: Order[] = [];
+      if (symbol) {
+        // 仅获取当前交易对
+        allOrders = await getHistoricalOrders(symbol, { limit });
+      } else {
+        // 支持的交易对列表
+        const tokens: ('ETHUSDT' | 'BTCUSDT' | 'SOLUSDT')[] = ['ETHUSDT', 'BTCUSDT', 'SOLUSDT'];
+        // 并行获取所有交易对的历史订单
+        const results = await Promise.all(tokens.map(token => getHistoricalOrders(token, { limit })));
+        allOrders = results.flat();
+      }
       
-      // 并行获取所有交易对的历史订单
-      const promises = tokens.map(token => getHistoricalOrders(token, { limit }));
-      const results = await Promise.all(promises);
-      
-      // 合并所有订单并按时间排序
-      const allOrders = results.flat();
+      // 按时间降序排序
       allOrders.sort((a, b) => b.time - a.time); // 按时间降序排序
       
       setOrders(allOrders);
@@ -37,7 +45,7 @@ const HistoricalOrders: React.FC = () => {
   // 组件挂载时获取数据，当组件重新渲染或limit变化时都重新获取
   useEffect(() => {
     fetchHistoricalOrders();
-  }, [limit]);
+  }, [limit, symbol]);
 
   // 表格列配置
   const columns: ColumnsType<Order> = [
@@ -116,23 +124,26 @@ const HistoricalOrders: React.FC = () => {
   return (
     <div className="historical-orders">
       <div className="order-controls" style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '16px', marginBottom: '8px' }}>
-        <div>
-          <label style={{ marginRight: '8px' }}>显示数量:</label>
-          <Select
-            value={limit}
-            onChange={(value) => setLimit(value)}
-            style={{ width: 100 }}
-            options={[
-              { value: 10, label: '10' },
-              { value: 20, label: '20' },
-              { value: 50, label: '50' },
-              { value: 100, label: '100' },
-            ]}
-          />
+        {/* <div style={{ fontWeight: 500 }}>{symbol ? `${symbol} 当前订单` : '全部订单'}</div> */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          {/* <div>
+            <label style={{ marginRight: '8px' }}>显示数量:</label>
+            <Select
+              value={limit}
+              onChange={(value) => setLimit(value)}
+              style={{ width: 100 }}
+              options={[
+                { value: 10, label: '10' },
+                { value: 20, label: '20' },
+                { value: 50, label: '50' },
+                { value: 100, label: '100' },
+              ]}
+            />
+          </div> */}
+          <Button type="primary" onClick={fetchHistoricalOrders} loading={loading}>
+            刷新
+          </Button>
         </div>
-        <Button type="primary" onClick={fetchHistoricalOrders} loading={loading}>
-          刷新
-        </Button>
       </div>
       
       {loading && (

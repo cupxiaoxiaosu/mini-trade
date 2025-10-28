@@ -1,107 +1,21 @@
 import axios, { AxiosInstance } from 'axios';
 import { API_KEY, API_SECRET } from './config';
 import querystring from 'querystring';
+import type { 
+  RequestParams, 
+  AccountInfo, 
+  Balance, 
+  Order,
+  NewOrderParams,
+  OrderSide,
+  OrderType,
+  TimeInForce,
+  NewOrderRespType
+} from './types';
 
 // API基础配置
 const TESTNET_BASE_URL = ''; // 使用本地开发服务器地址
 const API_VERSION = 'v3';
-
-// 公共请求参数接口
-interface RequestParams {
-  timestamp: number;
-  [key: string]: any;
-}
-
-// 账户信息接口
-export interface AccountInfo {
-  makerCommission: number;
-  takerCommission: number;
-  buyerCommission: number;
-  sellerCommission: number;
-  canTrade: boolean;
-  canWithdraw: boolean;
-  canDeposit: boolean;
-  updateTime: number;
-  balances: Balance[];
-}
-
-// 余额信息接口
-export interface Balance {
-  asset: string;
-  free: string;
-  locked: string;
-}
-
-// 订单信息接口
-export interface Order {
-  symbol: string;
-  orderId: number;
-  orderListId: number;
-  clientOrderId: string;
-  price: string;
-  origQty: string;
-  executedQty: string;
-  cummulativeQuoteQty: string;
-  status: string;
-  timeInForce: string;
-  type: string;
-  side: string;
-  stopPrice: string;
-  icebergQty: string;
-  time: number;
-  updateTime: number;
-  isWorking: boolean;
-  origQuoteOrderQty: string;
-}
-
-// 订单方向枚举
-export enum OrderSide {
-  BUY = 'BUY',
-  SELL = 'SELL'
-}
-
-// 订单类型枚举
-export enum OrderType {
-  LIMIT = 'LIMIT',
-  MARKET = 'MARKET',
-  STOP_LOSS = 'STOP_LOSS',
-  STOP_LOSS_LIMIT = 'STOP_LOSS_LIMIT',
-  TAKE_PROFIT = 'TAKE_PROFIT',
-  TAKE_PROFIT_LIMIT = 'TAKE_PROFIT_LIMIT',
-  LIMIT_MAKER = 'LIMIT_MAKER'
-}
-
-// 订单有效期枚举
-export enum TimeInForce {
-  GTC = 'GTC',
-  IOC = 'IOC',
-  FOK = 'FOK',
-  GTX = 'GTX'
-}
-
-// 订单响应类型枚举
-export enum NewOrderRespType {
-  ACK = 'ACK',
-  RESULT = 'RESULT',
-  FULL = 'FULL'
-}
-
-// 下单参数接口
-export interface NewOrderParams {
-  symbol: string;
-  side: OrderSide;
-  type: OrderType;
-  timeInForce?: TimeInForce;
-  quantity?: string;
-  quoteOrderQty?: string;
-  price?: string;
-  newClientOrderId?: string;
-  stopPrice?: string;
-  trailingDelta?: number;
-  icebergQty?: string;
-  newOrderRespType?: NewOrderRespType;
-  recvWindow?: number;
-}
 
 /**
  * Binance API客户端类

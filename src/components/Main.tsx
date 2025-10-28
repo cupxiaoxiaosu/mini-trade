@@ -4,15 +4,13 @@ type token = 'ETHUSDT' | 'BTCUSDT' | 'SOLUSDT';
 import OrderBook from './OrderBook';
 import { Kline } from './Kline';
 import BookTicker from './BookTicker';
-import Balance from './Balance';
 import HistoricalOrders from './HistoricalOrders';
 import TradeForm from './TradeForm';
-import { Select, Button, Badge, Tabs, Row, Col, Layout, Card, Typography } from 'antd';
-import { CaretRightOutlined, CloseOutlined, BarChartOutlined, WalletOutlined, FileTextOutlined } from '@ant-design/icons';
-import { binanceApi } from '../adaptor/biance/api';
+import { Select, Button, Badge, Layout, Card, Divider } from 'antd';
+import { CaretRightOutlined, CloseOutlined } from '@ant-design/icons';
+import { binanceApi } from '../adaptor/biance';
 
-const { Header, Content, Sider } = Layout;
-const { Title } = Typography;
+const { Header, Content } = Layout;
 const Main: React.FC = () => {
   const { isConnected, connect, disconnect, error, trade, kline, bookTicker } = useBinanceWebSocket();
   const [selectedToken, setSelectedToken] = useState<token>('ETHUSDT');
@@ -66,6 +64,8 @@ const Main: React.FC = () => {
     fetchBalances();
   };
 
+  const coinSymbol = selectedToken.split('USDT')[0];
+
   return (
     <Layout className="exchange-layout">
       {/* 顶部导航 */}
@@ -85,14 +85,6 @@ const Main: React.FC = () => {
                     { value: 'solusdt', label: 'SOL/USDT' }
                   ]}
                   placeholder="请选择交易对"
-                  styles={{
-                    popup: {
-                      root: {
-                        backgroundColor: '#1e1e1e',
-                        borderColor: '#333'
-                      }
-                    }
-                  }}
                 />
               </div>
               
@@ -132,81 +124,93 @@ const Main: React.FC = () => {
             错误: {error.message}
           </div>
         )}
-        
-        <Tabs
-          className="exchange-tabs"
-          defaultActiveKey="trade"
-          items={[
-            {
-              key: 'trade',
-              label: <span><BarChartOutlined /> 交易</span>,
-              children: (
-                <div className="trade-page">
-                  <Row gutter={[16, 16]}>
-                    {/* 左侧订单簿 */}
-                      <Col xs={24} lg={8}>
-                        <OrderBook data={trade[selectedToken]} token={selectedToken} />
 
-                      </Col>
-                       
-                      {/* 中间K线和行情 */}
-                      <Col xs={24} lg={16}>
-                        <Card title="行情数据" className="exchange-card"      variant="outlined">
-                            <BookTicker data={bookTicker[selectedToken]} token={selectedToken} />
-                          </Card>
-                        <Card title="K线图" className="exchange-card" variant="outlined" style={{ marginTop: '16px' }}>
-                          <Kline data={kline[selectedToken]} token={selectedToken} />
-                        </Card>
-                    
-                      </Col>
-                  </Row>
-                  
+        <div className="home-grid">
+          {/* 第一行：左-行情，右-余额 */}
+          <Card title="行情数据" className="exchange-card grid-row-1-left" variant="outlined">
+            <BookTicker data={bookTicker[selectedToken]} token={selectedToken} />
+          </Card>
+          <Card 
+            title={`${selectedToken} 余额`} 
+            className="exchange-card grid-row-1-right" 
+            variant="outlined"
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14 }}>
+              <span>{coinSymbol}</span>
+              <span style={{ fontWeight: 600 }}>{selectedCoinBalance.toFixed(6)}</span>
+            </div>
+            <Divider style={{ margin: '12px 0' }} />
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14 }}>
+              <span>USDT</span>
+              <span style={{ fontWeight: 600 }}>{usdtBalance.toFixed(2)}</span>
+            </div>
+          </Card>
 
+          {/* 第二行左侧列：K线 + 订单簿 */}
+          <div className="grid-row-2-left">
+            <Card title="K线图" className="exchange-card" variant="outlined">
+              <Kline data={kline[selectedToken]} token={selectedToken} />
+            </Card>
+            <Card title="订单簿" className="exchange-card" variant="outlined">
+              <OrderBook data={trade[selectedToken]} token={selectedToken} />
+            </Card>
+          </div>
+
+          {/* 第二行右侧列：交易 + 当前订单 */}
+          <div className="grid-row-2-right">
+            <Card 
+              title="交易" 
+              className="exchange-card" 
+              variant="outlined"
+              extra={
+                <div style={{ textAlign: 'right', lineHeight: 1.3 }}>
+                  <div style={{ fontSize: 12, color: 'var(--text-secondary, #8c8c8c)' }}>最新价格</div>
+                  <div style={{ fontWeight: 700 }}>
+                    {(() => {
+                      const tickerData = bookTicker[selectedToken];
+                      if (tickerData) {
+                        const bid = parseFloat(tickerData.b || '0');
+                        const ask = parseFloat(tickerData.a || '0');
+                        const price = bid && ask ? (bid + ask) / 2 : (bid || ask || 0);
+                        return price ? `${price.toFixed(2)} USDT` : '--';
+                      }
+                      return '--';
+                    })()}
+                  </div>
                 </div>
-              ),
-            },
-            {
-              key: 'orders',
-              label: <span><FileTextOutlined /> 订单</span>,
-              children: (
-                  <div className="orders-page">
-                    <Card className="exchange-card" variant="outlined">
-                      <HistoricalOrders key={`orders-${refreshKey}`} />
-                    </Card>
-                </div>
-              ),
-            },
-            {key: 'funds',
-              label: <span><WalletOutlined /> 资金</span>,
-              children: (
-                <div className="funds-page">
-                  <Card className="exchange-card" variant="outlined">
-                    <Balance key={`balance-${refreshKey}`} />
-                  </Card>
-                  <Card className="exchange-card" variant="outlined" style={{ marginTop: '16px' }}>
-                    <TradeForm 
-                      selectedToken={selectedToken} 
-                      onOrderCreated={handleOrderCreated}
-                      balance={usdtBalance}
-                      coinBalance={selectedCoinBalance}
-                      currentPrice={(() => {
-                        // 从bookTicker获取当前价格
-                        const tickerData = bookTicker[selectedToken];
-                        if (tickerData && typeof tickerData === 'object') {
-                          const price = tickerData.c || tickerData.lastPrice || tickerData.b || tickerData.a;
-                          if (price) {
-                            return parseFloat(price);
-                          }
-                        }
-                        return 0;
-                      })()}
-                    />
-                  </Card>
-                </div>
-              ),
-            },
-          ]}
-        />
+              }
+            >
+              <div style={{ paddingTop: 4 }}>
+                <TradeForm 
+                  selectedToken={selectedToken} 
+                  onOrderCreated={handleOrderCreated}
+                  balance={usdtBalance}
+                  coinBalance={selectedCoinBalance}
+                  currentPrice={(() => {
+                    const tickerData = bookTicker[selectedToken];
+                    if (tickerData) {
+                      const bid = parseFloat(tickerData.b || '0');
+                      const ask = parseFloat(tickerData.a || '0');
+                      if (bid && ask) return (bid + ask) / 2;
+                      if (bid) return bid;
+                      if (ask) return ask;
+                    }
+                    return 0;
+                  })()}
+                />
+              </div>
+            </Card>
+
+            <Card 
+              title="当前订单" 
+              className="exchange-card" 
+              variant="outlined"
+              extra={<div style={{ fontSize: 12, color: 'var(--text-secondary, #8c8c8c)' }}>最近记录</div>}
+            >
+              <HistoricalOrders key={`orders-${refreshKey}`} symbol={selectedToken} />
+            </Card>
+          </div>
+        </div>
       </Content>
     </Layout>
   );

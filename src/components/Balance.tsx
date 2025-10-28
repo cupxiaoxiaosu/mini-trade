@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Statistic, Row, Col, Spin, Alert } from 'antd';
-import type { Balance } from '../adaptor/biance/api';
-import { binanceApi, getHistoricalOrders } from '../adaptor/biance/api';
+import type { Balance } from '../adaptor/biance';
+import { binanceApi, getHistoricalOrders } from '../adaptor/biance';
 
 const Balance: React.FC = () => {
   const [balances, setBalances] = useState<Balance[]>([]);

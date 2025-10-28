@@ -208,9 +208,54 @@ body {
 
 .exchange-content {
   padding: 20px;
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden; /* 避免出现横向滚动条 */
   background-color: #141414;
   height: calc(100vh - 64px);
+}
+
+/* 首页网格布局 */
+.home-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 360px);
+  grid-template-rows: auto 1fr; /* 第一行：行情/余额，第二行：双列嵌套 */
+  gap: 16px;
+  width: 100%;
+}
+
+/* 第一行：左右对齐 */
+.grid-row-1-left { grid-column: 1; grid-row: 1; }
+.grid-row-1-right { grid-column: 2; grid-row: 1; }
+
+/* 第二行左侧列（K线 + 订单簿） */
+.grid-row-2-left {
+  grid-column: 1;
+  grid-row: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* 第二行右侧列（交易 + 当前订单） */
+.grid-row-2-right {
+  grid-column: 2;
+  grid-row: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* 响应式：小屏下单列堆叠 */
+@media (max-width: 992px) {
+  .home-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+  }
+  
+  .grid-row-2-left,
+  .grid-row-2-right {
+    display: block;
+  }
 }
 
 /* 卡片样式 */
