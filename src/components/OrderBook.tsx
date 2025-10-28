@@ -2,6 +2,7 @@ import React from 'react';
 import { Table } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import {  TradeData } from '../adaptor/biance/index';
+import { useTranslation } from 'react-i18next';
 type token = 'ETHUSDT' | 'BTCUSDT' | 'SOLUSDT';
 // 交易列表接口
 
@@ -11,13 +12,15 @@ interface OrderBookProps {
 }
 
 export const OrderBook: React.FC<OrderBookProps> = ({ data, token }) => {
+  const { t } = useTranslation();
+  
   // 将trade对象转换为扁平数组，包含交易对信息
   
   
   // 定义表格列
   const columns: ColumnsType<TradeData> = [
     {
-      title: '交易对',
+      title: t('orderBook.symbol'),
       dataIndex: 'symbol',
       key: 'symbol',
       width: 100,
@@ -25,20 +28,20 @@ export const OrderBook: React.FC<OrderBookProps> = ({ data, token }) => {
       render: () => token.toUpperCase(),
     },
     {
-      title: '价格',
+      title: t('orderBook.price'),
       dataIndex: 'p',
       key: 'price',
       render: (text: string) => parseFloat(text).toFixed(2),
       sorter: (a, b) => parseFloat(a.p) - parseFloat(b.p),
     },
     {
-      title: '数量',
+      title: t('orderBook.quantity'),
       dataIndex: 'q',
       key: 'quantity',
       render: (text: string) => parseFloat(text).toFixed(4),
     },
     {
-      title: '成交额',
+      title: t('orderBook.amount'),
       key: 'amount',
       render: (record) => {
         const price = parseFloat(record.p);
@@ -52,17 +55,17 @@ export const OrderBook: React.FC<OrderBookProps> = ({ data, token }) => {
       },
     },
     {
-      title: '方向',
+      title: t('orderBook.direction'),
       key: 'side',
       dataIndex: 'm',
       render: (isSell: boolean) => (
         <span style={{ color: isSell ? '#f5222d' : '#52c41a' }}>
-          {isSell ? '卖出' : '买入'}
+          {isSell ? t('orderBook.sell') : t('orderBook.buy')}
         </span>
       ),
     },
     {
-      title: '时间',
+      title: t('orderBook.time'),
       dataIndex: 'T',
       key: 'time',
       render: (timestamp: number) => {
@@ -72,7 +75,7 @@ export const OrderBook: React.FC<OrderBookProps> = ({ data, token }) => {
       sorter: (a, b) => a.T - b.T,
     },
     {
-      title: '交易ID',
+      title: t('orderBook.tradeId'),
       dataIndex: 't',
       key: 'tradeId',
       width: 100,

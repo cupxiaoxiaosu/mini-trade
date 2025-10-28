@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Card, Statistic, Row, Col, Spin, Alert } from 'antd';
 import type { Balance } from '../adaptor/biance';
 import { binanceApi, getHistoricalOrders } from '../adaptor/biance';
+import { useTranslation } from 'react-i18next';
 
 const Balance: React.FC = () => {
+  const { t } = useTranslation();
   const [balances, setBalances] = useState<Balance[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -26,7 +28,7 @@ const Balance: React.FC = () => {
       setBalances(activeBalances);
     } catch (err) {
       console.error('获取账户余额失败:', err);
-      setError(err instanceof Error ? err.message : '获取账户余额失败');
+      setError(err instanceof Error ? err.message : t('balance.fetchFailed'));
     } finally {
       setLoading(false);
     }
@@ -116,13 +118,13 @@ const Balance: React.FC = () => {
       {loading && (
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px', flexDirection: 'column' }}>
           <Spin size="large" />
-          <div style={{ marginTop: '16px', fontSize: '16px', color: '#666' }}>正在获取账户余额...</div>
+          <div style={{ marginTop: '16px', fontSize: '16px', color: '#666' }}>{t('balance.fetchingBalance')}</div>
         </div>
       )}
       
       {error && (
         <Alert
-          message="错误"
+          message={t('common.error')}
           description={error}
           type="error"
           showIcon
@@ -139,7 +141,7 @@ const Balance: React.FC = () => {
                 cursor: 'pointer'
               }}
             >
-              重试
+              {t('common.retry')}
             </button>
           }
         />
@@ -156,7 +158,7 @@ const Balance: React.FC = () => {
                   valueStyle={{ color: '#3f8600' }}
                   prefix="$"
                   suffix="USDT"
-                  title="总资产"
+                  title={t('balance.totalAsset')}
                 />
               </Card>
             </Col>
@@ -165,7 +167,7 @@ const Balance: React.FC = () => {
                 {plLoading ? (
                   <div style={{ height: '80px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <Spin size="small" />
-                    <span style={{ marginLeft: '8px' }}>计算中...</span>
+                    <span style={{ marginLeft: '8px' }}>{t('balance.calculating')}</span>
                   </div>
                 ) : (
                   <>
@@ -175,10 +177,10 @@ const Balance: React.FC = () => {
                       valueStyle={{ color: profitLoss.amount >= 0 ? '#52c41a' : '#f5222d' }}
                       prefix={profitLoss.amount >= 0 ? '+' : ''}
                       suffix="USDT"
-                      title="总盈亏"
+                      title={t('balance.totalProfitLoss')}
                     />
                     <div style={{ marginTop: '8px', fontSize: '14px' }}>
-                      盈亏率: <span style={{ color: profitLoss.percent >= 0 ? '#52c41a' : '#f5222d' }}>
+                      {t('balance.profitLossRate')} <span style={{ color: profitLoss.percent >= 0 ? '#52c41a' : '#f5222d' }}>
                         {profitLoss.percent >= 0 ? '+' : ''}{profitLoss.percent.toFixed(2)}%
                       </span>
                     </div>
@@ -208,8 +210,8 @@ const Balance: React.FC = () => {
                       suffix={balance.asset}
                     />
                     <div style={{ marginTop: '8px', fontSize: '12px', color: '#999' }}>
-                      <div>可用: {parseFloat(balance.free).toFixed(6)}</div>
-                      <div>冻结: {parseFloat(balance.locked).toFixed(6)}</div>
+                      <div>{t('balance.available')}: {parseFloat(balance.free).toFixed(6)}</div>
+                      <div>{t('balance.locked')}: {parseFloat(balance.locked).toFixed(6)}</div>
                     </div>
                   </Card>
                 </Col>
@@ -219,8 +221,8 @@ const Balance: React.FC = () => {
           
           {balances.length === 0 && (
             <Alert
-              message="暂无余额"
-              description="您的账户中没有可用的余额"
+              message={t('balance.noBalance')}
+              description={t('balance.noBalanceDesc')}
               type="info"
               showIcon
             />

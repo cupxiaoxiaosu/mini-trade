@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button } from 'antd';
+import { useTranslation } from 'react-i18next';
 
 type ThemeToggleProps = {
   isDark: boolean;
@@ -7,10 +8,11 @@ type ThemeToggleProps = {
 };
 
 const ThemeToggle: React.FC<ThemeToggleProps> = ({ isDark, onToggle }) => {
+  const { t } = useTranslation();
   return (
     <Button
       type="default"
-      aria-label={isDark ? '切换为浅色模式' : '切换为深色模式'}
+      aria-label={isDark ? t('theme.switchToLight') : t('theme.switchToDark')}
       className="theme-toggle"
       onClick={onToggle}
       icon={

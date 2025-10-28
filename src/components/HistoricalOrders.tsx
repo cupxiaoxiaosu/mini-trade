@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Spin, Alert, Empty, Button, Select } from 'antd';
+import { Table, Spin, Alert, Empty, Button } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { getHistoricalOrders, type Order } from '../adaptor/biance';
+import { useTranslation } from 'react-i18next';
 
 type HistoricalOrdersProps = {
   symbol?: 'ETHUSDT' | 'BTCUSDT' | 'SOLUSDT';
 };
 
 const HistoricalOrders: React.FC<HistoricalOrdersProps> = ({ symbol }) => {
+  const { t } = useTranslation();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [limit, setLimit] = useState<number>(20);
+  const [limit] = useState<number>(20);
 
   // 获取历史订单数据
   const fetchHistoricalOrders = async () => {
@@ -36,7 +38,7 @@ const HistoricalOrders: React.FC<HistoricalOrdersProps> = ({ symbol }) => {
       
       setOrders(allOrders);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '获取历史订单失败');
+      setError(err instanceof Error ? err.message : t('historicalOrders.fetchFailed'));
     } finally {
       setLoading(false);
     }
@@ -50,68 +52,68 @@ const HistoricalOrders: React.FC<HistoricalOrdersProps> = ({ symbol }) => {
   // 表格列配置
   const columns: ColumnsType<Order> = [
     {
-      title: '订单ID',
+      title: t('historicalOrders.orderId'),
       dataIndex: 'orderId',
       key: 'orderId',
       sorter: (a, b) => a.orderId - b.orderId,
     },
     {
-      title: '交易对',
+      title: t('historicalOrders.symbol'),
       dataIndex: 'symbol',
       key: 'symbol',
     },
     {
-      title: '方向',
+      title: t('historicalOrders.direction'),
       dataIndex: 'side',
       key: 'side',
       render: (side) => {
         const color = side === 'BUY' ? 'green' : 'red';
-        return <span style={{ color }}>{side === 'BUY' ? '买入' : '卖出'}</span>;
+        return <span style={{ color }}>{side === 'BUY' ? t('orderBook.buy') : t('orderBook.sell')}</span>;
       },
     },
     {
-      title: '类型',
+      title: t('historicalOrders.type'),
       dataIndex: 'type',
       key: 'type',
-      render: (type) => type === 'MARKET' ? '市价单' : '限价单',
+      render: (type) => type === 'MARKET' ? t('historicalOrders.marketOrder') : t('historicalOrders.limitOrder'),
     },
     {
-      title: '价格',
+      title: t('historicalOrders.price'),
       dataIndex: 'price',
       key: 'price',
       sorter: (a, b) => parseFloat(a.price) - parseFloat(b.price),
     },
     {
-      title: '数量',
+      title: t('historicalOrders.quantity'),
       dataIndex: 'origQty',
       key: 'origQty',
       sorter: (a, b) => parseFloat(a.origQty) - parseFloat(b.origQty),
     },
     {
-      title: '已执行',
+      title: t('historicalOrders.executed'),
       dataIndex: 'executedQty',
       key: 'executedQty',
       sorter: (a, b) => parseFloat(a.executedQty) - parseFloat(b.executedQty),
     },
     {
-      title: '状态',
+      title: t('historicalOrders.status'),
       dataIndex: 'status',
       key: 'status',
       render: (status) => {
         const statusMap: Record<string, string> = {
-          'NEW': '新建',
-          'FILLED': '完全成交',
-          'PARTIALLY_FILLED': '部分成交',
-          'CANCELED': '已取消',
-          'PENDING_CANCEL': '取消中',
-          'REJECTED': '已拒绝',
-          'EXPIRED': '已过期',
+          'NEW': t('historicalOrders.newOrder'),
+          'FILLED': t('historicalOrders.filled'),
+          'PARTIALLY_FILLED': t('historicalOrders.partiallyFilled'),
+          'CANCELED': t('historicalOrders.canceled'),
+          'PENDING_CANCEL': t('historicalOrders.canceling'),
+          'REJECTED': t('historicalOrders.rejected'),
+          'EXPIRED': t('historicalOrders.expired'),
         };
         return statusMap[status] || status;
       },
     },
     {
-      title: '时间',
+      title: t('historicalOrders.time'),
       dataIndex: 'time',
       key: 'time',
       sorter: (a, b) => a.time - b.time,
@@ -141,34 +143,34 @@ const HistoricalOrders: React.FC<HistoricalOrdersProps> = ({ symbol }) => {
             />
           </div> */}
           <Button type="primary" onClick={fetchHistoricalOrders} loading={loading}>
-            刷新
+            {t('common.refresh')}
           </Button>
         </div>
       </div>
       
       {loading && (
         <div style={{ textAlign: 'center', padding: '40px 0' }}>
-          <Spin tip="加载中..." />
+          <Spin tip={t('common.loading')} />
         </div>
       )}
       
       {error && (
         <Alert
-          message="获取订单失败"
+          message={t('historicalOrders.fetchFailed')}
           description={error}
           type="error"
           showIcon
           style={{ marginBottom: '16px' }}
           action={
             <Button type="primary" size="small" onClick={fetchHistoricalOrders}>
-              重试
+              {t('common.retry')}
             </Button>
           }
         />
       )}
       
       {!loading && !error && orders.length === 0 && (
-        <Empty description="暂无历史订单" style={{ padding: '40px 0' }} />
+        <Empty description={t('historicalOrders.noOrders')} style={{ padding: '40px 0' }} />
       )}
       
       {!loading && !error && orders.length > 0 && (
@@ -179,7 +181,7 @@ const HistoricalOrders: React.FC<HistoricalOrdersProps> = ({ symbol }) => {
           pagination={{
             pageSize: 10,
             showSizeChanger: true,
-            showTotal: (total) => `共 ${total} 条记录`,
+            showTotal: (total) => t('historicalOrders.totalRecords', { total }),
           }}
           scroll={{ x: 1200 }}
         />

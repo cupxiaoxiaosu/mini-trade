@@ -1,0 +1,106 @@
+{
+  "common": {
+    "connect": "Connect",
+    "disconnect": "Disconnect",
+    "connected": "Connected",
+    "notConnected": "Not Connected",
+    "error": "Error",
+    "refresh": "Refresh",
+    "retry": "Retry",
+    "loading": "Loading...",
+    "noData": "No Data"
+  },
+  "main": {
+    "tradingPair": "Trading Pair",
+    "selectPair": "Please select a trading pair",
+    "marketData": "Market Data",
+    "balance": "Balance",
+    "klineChart": "K-Line Chart",
+    "orderBook": "Order Book",
+    "trade": "Trade",
+    "currentOrders": "Current Orders",
+    "latestPrice": "Latest Price",
+    "recentRecords": "Recent Records"
+  },
+  "orderBook": {
+    "symbol": "Symbol",
+    "price": "Price",
+    "quantity": "Quantity",
+    "amount": "Amount",
+    "direction": "Direction",
+    "buy": "Buy",
+    "sell": "Sell",
+    "time": "Time",
+    "tradeId": "Trade ID"
+  },
+  "bookTicker": {
+    "bidPrice": "Bid Price (b)",
+    "bidQuantity": "Bid Quantity (B)",
+    "askPrice": "Ask Price (a)",
+    "askQuantity": "Ask Quantity (A)",
+    "noData": "No market data available"
+  },
+  "tradeForm": {
+    "buy": "Buy",
+    "sell": "Sell",
+    "available": "Available",
+    "maxCanBuy": "Max Buy",
+    "canSellUSD": "Can Sell USDT:",
+    "quantity": "Quantity",
+    "enterQuantity": "Enter {{coin}} quantity",
+    "currentSelect": "Current Selection",
+    "investment": "Investment",
+    "sellCanGet": "Sell {{quantity}} {{coin}} can get",
+    "expectedTotal": "Expected Total:",
+    "expectedGet": "Expected Amount:",
+    "availableBalance": "Available Balance:",
+    "buying": "Buying...",
+    "selling": "Selling...",
+    "buyButton": "Buy {{coin}}",
+    "sellButton": "Sell {{coin}}",
+    "insufficientUSDT": "Insufficient USDT balance, please reduce purchase quantity",
+    "insufficientCoin": "Insufficient {{coin}} balance, please reduce sell quantity",
+    "orderCreated": "Order created successfully",
+    "orderFailed": "Order creation failed"
+  },
+  "historicalOrders": {
+    "orderId": "Order ID",
+    "symbol": "Symbol",
+    "direction": "Direction",
+    "type": "Type",
+    "price": "Price",
+    "quantity": "Quantity",
+    "executed": "Executed",
+    "status": "Status",
+    "time": "Time",
+    "fetchFailed": "Failed to fetch orders",
+    "noOrders": "No historical orders",
+    "totalRecords": "Total {{total}} records",
+    "newOrder": "New",
+    "filled": "Filled",
+    "partiallyFilled": "Partially Filled",
+    "canceled": "Canceled",
+    "canceling": "Canceling",
+    "rejected": "Rejected",
+    "expired": "Expired",
+    "marketOrder": "Market Order",
+    "limitOrder": "Limit Order"
+  },
+  "balance": {
+    "totalAsset": "Total Assets",
+    "totalProfitLoss": "Total P&L",
+    "profitLossRate": "P&L Rate:",
+    "calculating": "Calculating...",
+    "fetchingBalance": "Fetching account balance...",
+    "fetchFailed": "Failed to fetch account balance",
+    "noBalance": "No Balance",
+    "noBalanceDesc": "Your account has no available balance",
+    "available": "Available",
+    "locked": "Locked"
+  },
+  "theme": {
+    "switchToDark": "Switch to dark mode",
+    "switchToLight": "Switch to light mode"
+  }
+}
+

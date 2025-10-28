@@ -1,6 +1,7 @@
 import React from 'react';
 import type { BookTickerData } from '../adaptor/biance/index';
 import { Card, Row, Col, Statistic } from 'antd';
+import { useTranslation } from 'react-i18next';
 type token = 'ETHUSDT' | 'BTCUSDT' | 'SOLUSDT';
 
 interface BookTickerProps {
@@ -9,11 +10,12 @@ interface BookTickerProps {
 }
 
 const BookTicker: React.FC<BookTickerProps> = ({ data, token }) => {
+  const { t } = useTranslation();
   return (
     <div>  {data ? (
         <Row gutter={[16, 16]} justify="center">
           <Col xs={12} sm={6}>
-            <Card size="small" title="买一价 (b)" variant="outlined">
+            <Card size="small" title={t('bookTicker.bidPrice')} variant="outlined">
               <Statistic 
                 value={parseFloat(data.b || '0')} 
                 precision={8}
@@ -22,7 +24,7 @@ const BookTicker: React.FC<BookTickerProps> = ({ data, token }) => {
             </Card>
           </Col>
           <Col xs={12} sm={6}>
-            <Card size="small" title="买一量 (B)" variant="outlined">
+            <Card size="small" title={t('bookTicker.bidQuantity')} variant="outlined">
               <Statistic 
                 value={parseFloat(data.B || '0')} 
                 precision={8}
@@ -31,7 +33,7 @@ const BookTicker: React.FC<BookTickerProps> = ({ data, token }) => {
             </Card>
           </Col>
           <Col xs={12} sm={6}>
-            <Card size="small" title="卖一价 (a)" variant="outlined">
+            <Card size="small" title={t('bookTicker.askPrice')} variant="outlined">
               <Statistic 
                 value={parseFloat(data.a || '0')} 
                 precision={8}
@@ -40,7 +42,7 @@ const BookTicker: React.FC<BookTickerProps> = ({ data, token }) => {
             </Card>
           </Col>
           <Col xs={12} sm={6}>
-            <Card size="small" title="卖一量 (A)" variant="outlined">
+            <Card size="small" title={t('bookTicker.askQuantity')} variant="outlined">
               <Statistic 
                 value={parseFloat(data.A || '0')} 
                 precision={8}
@@ -51,7 +53,7 @@ const BookTicker: React.FC<BookTickerProps> = ({ data, token }) => {
         </Row>
       ) : (
         <div style={{ textAlign: 'center', padding: '40px 0', color: '#8c8c8c' }}>
-          暂无买卖盘数据
+          {t('bookTicker.noData')}
         </div>
       )}
     </div>

@@ -9,9 +9,11 @@ import TradeForm from './TradeForm';
 import { Select, Button, Badge, Layout, Card, Divider } from 'antd';
 import { CaretRightOutlined, CloseOutlined } from '@ant-design/icons';
 import { binanceApi } from '../adaptor/biance';
+import { useTranslation } from 'react-i18next';
 
 const { Header, Content } = Layout;
 const Main: React.FC = () => {
+  const { t } = useTranslation();
   const { isConnected, connect, disconnect, error, trade, kline, bookTicker } = useBinanceWebSocket();
   const [selectedToken, setSelectedToken] = useState<token>('ETHUSDT');
   const [usdtBalance, setUsdtBalance] = useState<number>(10000);
@@ -74,7 +76,7 @@ const Main: React.FC = () => {
           <div className="header-left">
             <div className="main-controls" style={{ display: 'flex', alignItems: 'center', gap: '20px', marginLeft: '30px' }}>
               <div className="symbol-selector" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ color: 'white' }}>交易对:</span>
+                <span style={{ color: 'white' }}>{t('main.tradingPair')}:</span>
                 <Select
                   value={selectedToken.toLowerCase()}
                   onChange={handleSymbolChange}
@@ -84,14 +86,14 @@ const Main: React.FC = () => {
                     { value: 'btcusdt', label: 'BTC/USDT' },
                     { value: 'solusdt', label: 'SOL/USDT' }
                   ]}
-                  placeholder="请选择交易对"
+                  placeholder={t('main.selectPair')}
                 />
               </div>
               
               <div className="connection-status" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                 <Badge 
                   status={isConnected ? 'success' : 'error'} 
-                  text={<span style={{ color: 'white' }}>{isConnected ? '已连接' : '未连接'}</span>} 
+                  text={<span style={{ color: 'white' }}>{isConnected ? t('common.connected') : t('common.notConnected')}</span>} 
                 />
                 <div className="connection-controls">
                   <Button 
@@ -101,7 +103,7 @@ const Main: React.FC = () => {
                     disabled={isConnected}
                     style={{ marginRight: '8px' }}
                   >
-                    连接
+                    {t('common.connect')}
                   </Button>
                   <Button 
                     danger 
@@ -109,7 +111,7 @@ const Main: React.FC = () => {
                     onClick={() => disconnect()} 
                     disabled={!isConnected}
                   >
-                    断开连接
+                    {t('common.disconnect')}
                   </Button>
                 </div>
               </div>
@@ -121,17 +123,17 @@ const Main: React.FC = () => {
       <Content className="exchange-content">
         {error && (
           <div className="error-message" style={{ marginBottom: '16px' }}>
-            错误: {error.message}
+            {t('common.error')}: {error.message}
           </div>
         )}
 
         <div className="home-grid">
           {/* 第一行：左-行情，右-余额 */}
-          <Card title="行情数据" className="exchange-card grid-row-1-left" variant="outlined">
+          <Card title={t('main.marketData')} className="exchange-card grid-row-1-left" variant="outlined">
             <BookTicker data={bookTicker[selectedToken]} token={selectedToken} />
           </Card>
           <Card 
-            title={`${selectedToken} 余额`} 
+            title={`${selectedToken} ${t('main.balance')}`} 
             className="exchange-card grid-row-1-right" 
             variant="outlined"
           >
@@ -148,10 +150,10 @@ const Main: React.FC = () => {
 
           {/* 第二行左侧列：K线 + 订单簿 */}
           <div className="grid-row-2-left">
-            <Card title="K线图" className="exchange-card" variant="outlined">
+            <Card title={t('main.klineChart')} className="exchange-card" variant="outlined">
               <Kline data={kline[selectedToken]} token={selectedToken} />
             </Card>
-            <Card title="订单簿" className="exchange-card" variant="outlined">
+            <Card title={t('main.orderBook')} className="exchange-card" variant="outlined">
               <OrderBook data={trade[selectedToken]} token={selectedToken} />
             </Card>
           </div>
@@ -159,12 +161,12 @@ const Main: React.FC = () => {
           {/* 第二行右侧列：交易 + 当前订单 */}
           <div className="grid-row-2-right">
             <Card 
-              title="交易" 
+              title={t('main.trade')} 
               className="exchange-card" 
               variant="outlined"
               extra={
                 <div style={{ textAlign: 'right', lineHeight: 1.3 }}>
-                  <div style={{ fontSize: 12, color: 'var(--text-secondary, #8c8c8c)' }}>最新价格</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-secondary, #8c8c8c)' }}>{t('main.latestPrice')}</div>
                   <div style={{ fontWeight: 700 }}>
                     {(() => {
                       const tickerData = bookTicker[selectedToken];
@@ -202,10 +204,10 @@ const Main: React.FC = () => {
             </Card>
 
             <Card 
-              title="当前订单" 
+              title={t('main.currentOrders')} 
               className="exchange-card" 
               variant="outlined"
-              extra={<div style={{ fontSize: 12, color: 'var(--text-secondary, #8c8c8c)' }}>最近记录</div>}
+              extra={<div style={{ fontSize: 12, color: 'var(--text-secondary, #8c8c8c)' }}>{t('main.recentRecords')}</div>}
             >
               <HistoricalOrders key={`orders-${refreshKey}`} symbol={selectedToken} />
             </Card>

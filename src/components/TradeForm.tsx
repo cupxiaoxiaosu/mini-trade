@@ -3,8 +3,9 @@ import { Form, Input, Button, message, Typography } from 'antd';
 import { createOrder } from '../adaptor/biance/api';
 import { OrderSide, OrderType, TimeInForce, type NewOrderParams } from '../adaptor/biance/types';
 import type { token } from '../adaptor/biance';
+import { useTranslation } from 'react-i18next';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 interface TradeFormProps {
   selectedToken: token;
@@ -21,6 +22,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
   coinBalance = 10,
   currentPrice = 0
 }) => {
+  const { t } = useTranslation();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [quantityPercentage, setQuantityPercentage] = useState(0);
@@ -104,13 +106,13 @@ const TradeForm: React.FC<TradeFormProps> = ({
         const requiredAmount = quantity * orderPrice;
         console.log('买入所需USDT:', requiredAmount, '可用余额:', balance);
         if (requiredAmount > balance) {
-          message.error('USDT余额不足，请减少购买数量');
+          message.error(t('tradeForm.insufficientUSDT'));
           return;
         }
       } else {
         console.log('卖出数量:', quantity, '可用余额:', coinBalance);
         if (quantity > coinBalance) {
-          message.error(`${coinSymbol}余额不足，请减少卖出数量`);
+          message.error(t('tradeForm.insufficientCoin', { coin: coinSymbol }));
           return;
         }
       }
@@ -144,7 +146,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
       console.log('订单创建成功:', orderResult);
       
       // 6. 处理成功响应
-      message.success(`订单创建成功！订单ID: ${orderResult?.orderId || 'N/A'}`);
+      message.success(`${t('tradeForm.orderCreated')}! ${t('historicalOrders.orderId')}: ${orderResult?.orderId || 'N/A'}`);
       
       // 7. 通知父组件订单已创建
       if (onOrderCreated) {
@@ -160,7 +162,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
     } catch (error: any) {
       // 9. 处理错误
       console.error('下单失败:', error);
-      message.error(`订单创建失败: ${error.message || '未知错误'}`);
+      message.error(`${t('tradeForm.orderFailed')}: ${error.message || '未知错误'}`);
     } finally {
       // 10. 无论成功失败，都设置loading为false
       setLoading(false);
@@ -206,7 +208,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
             }}
             onClick={() => handleSideChange('BUY')}
           >
-            买入
+            {t('tradeForm.buy')}
           </div>
           <div
             style={{
@@ -221,7 +223,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
             }}
             onClick={() => handleSideChange('SELL')}
           >
-            卖出
+            {t('tradeForm.sell')}
           </div>
         </div>
         
@@ -229,11 +231,11 @@ const TradeForm: React.FC<TradeFormProps> = ({
         <div style={{ textAlign: 'right', marginTop: 8, fontSize: 14 }}>
           {side === 'BUY' ? (
             <>
-              <Text style={{ color: '#8c8c8c' }}>可用 USDT: </Text>
+              <Text style={{ color: '#8c8c8c' }}>{t('tradeForm.available')} USDT: </Text>
               <Text style={{ color: '#52c41a', fontWeight: 'bold' }}>{balance.toFixed(2)}</Text>
               {currentPrice > 0 && (
                 <>
-                  <Text style={{ color: '#8c8c8c', marginLeft: 10 }}>最大可买: </Text>
+                  <Text style={{ color: '#8c8c8c', marginLeft: 10 }}>{t('tradeForm.maxCanBuy')}: </Text>
                   <Text style={{ color: '#1976d2', fontWeight: 'bold' }}>
                     {(balance / currentPrice).toFixed(6)}
                   </Text>
@@ -243,11 +245,11 @@ const TradeForm: React.FC<TradeFormProps> = ({
             </>
           ) : (
             <>
-              <Text style={{ color: '#8c8c8c' }}>可用 {coinSymbol}: </Text>
+              <Text style={{ color: '#8c8c8c' }}>{t('tradeForm.available')} {coinSymbol}: </Text>
               <Text style={{ color: '#52c41a', fontWeight: 'bold' }}>{coinBalance.toFixed(6)}</Text>
               {currentPrice > 0 && (
                 <>
-                  <Text style={{ color: '#8c8c8c', marginLeft: 10 }}>可卖 USDT: </Text>
+                  <Text style={{ color: '#8c8c8c', marginLeft: 10 }}>{t('tradeForm.canSellUSD')} </Text>
                   <Text style={{ color: '#1976d2', fontWeight: 'bold' }}>
                     {(coinBalance * currentPrice).toFixed(2)}
                   </Text>
@@ -302,10 +304,10 @@ const TradeForm: React.FC<TradeFormProps> = ({
         </Form.Item> */}
 
         {/* 数量输入 */}
-        <Form.Item label="数量" name="quantity" rules={[{ required: true }]}>
+        <Form.Item label={t('tradeForm.quantity')} name="quantity" rules={[{ required: true }]}>
           <div>
             <Input 
-              placeholder={`请输入${coinSymbol}数量`} 
+              placeholder={t('tradeForm.enterQuantity', { coin: coinSymbol })} 
               type="number" 
               min="0.00000001" 
               step="any"
@@ -339,14 +341,14 @@ const TradeForm: React.FC<TradeFormProps> = ({
             
             {/* 交易信息 */}
             <div style={{ marginTop: '4px', fontSize: 12, color: '#8c8c8c' }}>
-              当前选择: {quantityPercentage}%
+              {t('tradeForm.currentSelect')}: {quantityPercentage}%
             </div>
             
             {form.getFieldValue('quantity') && (
               <div style={{ marginTop: '4px', fontSize: 12, color: '#1890ff' }}>
                 {side === 'BUY' ? 
-                  `投入 $${calculateInvestment().toFixed(2)} (${quantityPercentage}% 余额)` : 
-                  `卖出 ${form.getFieldValue('quantity')} ${coinSymbol} 可获得 $${calculateInvestment().toFixed(2)}`
+                  `${t('tradeForm.investment')} $${calculateInvestment().toFixed(2)} (${quantityPercentage}% ${t('tradeForm.availableBalance')})` : 
+                  t('tradeForm.sellCanGet', { quantity: form.getFieldValue('quantity'), coin: coinSymbol })+`: $${calculateInvestment().toFixed(2)}`
                 }
               </div>
             )}
@@ -357,14 +359,14 @@ const TradeForm: React.FC<TradeFormProps> = ({
         <div style={{ padding: '12px', backgroundColor: '#f5f5f5', borderRadius: 4, marginBottom: 16 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14 }}>
             <Text style={{ color: '#8c8c8c' }}>
-              {side === 'BUY' ? '预计总价:' : '预计获得:'}
+              {side === 'BUY' ? t('tradeForm.expectedTotal') : t('tradeForm.expectedGet')}
             </Text>
             <Text style={{ fontWeight: 'bold', color: '#1976d2' }}>
               {calculateInvestment().toFixed(2)} USDT
             </Text>
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, marginTop: 4 }}>
-            <Text style={{ color: '#8c8c8c' }}>可用余额:</Text>
+            <Text style={{ color: '#8c8c8c' }}>{t('tradeForm.availableBalance')}</Text>
             <Text style={{ color: '#52c41a' }}>
               {side === 'BUY' ? `${balance.toFixed(2)} USDT` : `${coinBalance.toFixed(6)} ${coinSymbol}`}
             </Text>
@@ -397,8 +399,8 @@ const TradeForm: React.FC<TradeFormProps> = ({
             }}
           >
             {loading ? 
-              (side === 'BUY' ? '买入中...' : '卖出中...') : 
-              `${side === 'BUY' ? '买入' : '卖出'} ${coinSymbol}`
+              (side === 'BUY' ? t('tradeForm.buying') : t('tradeForm.selling')) : 
+              (side === 'BUY' ? t('tradeForm.buyButton', { coin: coinSymbol }) : t('tradeForm.sellButton', { coin: coinSymbol }))
             }
           </Button>
         </Form.Item>
