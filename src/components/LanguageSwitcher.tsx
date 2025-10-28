@@ -1,7 +1,6 @@
 import React from 'react';
-import { Select, Button } from 'antd';
+import { Select } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { GlobalOutlined } from '@ant-design/icons';
 
 interface LanguageSwitcherProps {
   onLanguageChange?: (lang: string) => void;

@@ -1,14 +1,14 @@
 import React from 'react';
 import { Table } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import {  TradeData } from '../adaptor/biance/index';
 import { useTranslation } from 'react-i18next';
-type token = 'ETHUSDT' | 'BTCUSDT' | 'SOLUSDT';
-// 交易列表接口
+import type { TradeData } from '@/adaptor/biance';
+
+type Token = 'ETHUSDT' | 'BTCUSDT' | 'SOLUSDT';
 
 interface OrderBookProps {
   data: TradeData[];
-  token: token;
+  token: Token;
 }
 
 export const OrderBook: React.FC<OrderBookProps> = ({ data, token }) => {

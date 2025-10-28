@@ -1,21 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { useBinanceWebSocket } from '../hooks/useBinanceWebSocket';
-type token = 'ETHUSDT' | 'BTCUSDT' | 'SOLUSDT';
+import { Select, Button, Badge, Layout, Card, Divider } from 'antd';
+import { CaretRightOutlined, CloseOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
+import { useBinanceWebSocket } from '@/hooks/useBinanceWebSocket';
+import { binanceApi } from '@/adaptor/biance';
 import OrderBook from './OrderBook';
 import { Kline } from './Kline';
 import BookTicker from './BookTicker';
 import HistoricalOrders from './HistoricalOrders';
 import TradeForm from './TradeForm';
-import { Select, Button, Badge, Layout, Card, Divider } from 'antd';
-import { CaretRightOutlined, CloseOutlined } from '@ant-design/icons';
-import { binanceApi } from '../adaptor/biance';
-import { useTranslation } from 'react-i18next';
+
+type Token = 'ETHUSDT' | 'BTCUSDT' | 'SOLUSDT';
 
 const { Header, Content } = Layout;
+
 const Main: React.FC = () => {
   const { t } = useTranslation();
-  const { isConnected, connect, disconnect, error, trade, kline, bookTicker } = useBinanceWebSocket();
-  const [selectedToken, setSelectedToken] = useState<token>('ETHUSDT');
+  const { isConnected, connect, disconnect, error, trade, bookTicker } = useBinanceWebSocket();
+  const [selectedToken, setSelectedToken] = useState<Token>('ETHUSDT');
   const [usdtBalance, setUsdtBalance] = useState<number>(10000);
   const [selectedCoinBalance, setSelectedCoinBalance] = useState<number>(10);
   
@@ -49,20 +51,14 @@ const Main: React.FC = () => {
     fetchBalances();
   }, [selectedToken, isConnected]);
 
-  
-  
   const handleSymbolChange = (value: string) => {
-    setSelectedToken(value.toUpperCase() as token);
+    setSelectedToken(value.toUpperCase() as Token);
   };
-
- 
 
   const [refreshKey, setRefreshKey] = useState<number>(0);
 
   const handleOrderCreated = () => {
-    // 触发刷新，通过改变key强制重新渲染组件
     setRefreshKey(prev => prev + 1);
-    // 订单创建后刷新余额数据
     fetchBalances();
   };
 
@@ -70,7 +66,6 @@ const Main: React.FC = () => {
 
   return (
     <Layout className="exchange-layout">
-      {/* 顶部导航 */}
       <Header className="exchange-header">
         <div className="header-content">
           <div className="header-left">
@@ -128,7 +123,6 @@ const Main: React.FC = () => {
         )}
 
         <div className="home-grid">
-          {/* 第一行：左-行情，右-余额 */}
           <Card title={t('main.marketData')} className="exchange-card grid-row-1-left" variant="outlined">
             <BookTicker data={bookTicker[selectedToken]} token={selectedToken} />
           </Card>
@@ -151,14 +145,13 @@ const Main: React.FC = () => {
           {/* 第二行左侧列：K线 + 订单簿 */}
           <div className="grid-row-2-left">
             <Card title={t('main.klineChart')} className="exchange-card" variant="outlined">
-              <Kline data={kline[selectedToken]} token={selectedToken} />
+              <Kline token={selectedToken} />
             </Card>
             <Card title={t('main.orderBook')} className="exchange-card" variant="outlined">
               <OrderBook data={trade[selectedToken]} token={selectedToken} />
             </Card>
           </div>
 
-          {/* 第二行右侧列：交易 + 当前订单 */}
           <div className="grid-row-2-right">
             <Card 
               title={t('main.trade')} 

@@ -1,12 +1,13 @@
 import React from 'react';
-import type { BookTickerData } from '../adaptor/biance/index';
 import { Card, Row, Col, Statistic } from 'antd';
 import { useTranslation } from 'react-i18next';
-type token = 'ETHUSDT' | 'BTCUSDT' | 'SOLUSDT';
+import type { BookTickerData } from '@/adaptor/biance';
+
+type Token = 'ETHUSDT' | 'BTCUSDT' | 'SOLUSDT';
 
 interface BookTickerProps {
   data: BookTickerData | null;
-  token: token;
+  token: Token;
 }
 
 const BookTicker: React.FC<BookTickerProps> = ({ data, token }) => {

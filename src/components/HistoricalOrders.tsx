@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Spin, Alert, Empty, Button } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { getHistoricalOrders, type Order } from '../adaptor/biance';
 import { useTranslation } from 'react-i18next';
+import { getHistoricalOrders, type Order } from '@/adaptor/biance';
 
 type HistoricalOrdersProps = {
   symbol?: 'ETHUSDT' | 'BTCUSDT' | 'SOLUSDT';

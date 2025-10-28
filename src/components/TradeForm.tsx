@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Form, Input, Button, message, Typography } from 'antd';
-import { createOrder } from '../adaptor/biance/api';
-import { OrderSide, OrderType, TimeInForce, type NewOrderParams } from '../adaptor/biance/types';
-import type { token } from '../adaptor/biance';
 import { useTranslation } from 'react-i18next';
+import { createOrder, OrderSide, OrderType, TimeInForce, type NewOrderParams } from '@/adaptor/biance';
+
+type Token = 'ETHUSDT' | 'BTCUSDT' | 'SOLUSDT';
 
 const { Text } = Typography;
 
 interface TradeFormProps {
-  selectedToken: token;
+  selectedToken: Token;
   onOrderCreated?: () => void;
   balance?: number;
   coinBalance?: number;
-  currentPrice: number; // 从父组件传入价格
+  currentPrice: number;
 }
 
 const TradeForm: React.FC<TradeFormProps> = ({ 
