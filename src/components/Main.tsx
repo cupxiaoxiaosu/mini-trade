@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Select, Button, Badge, Layout, Card, Divider } from 'antd';
-import { CaretRightOutlined, CloseOutlined } from '@ant-design/icons';
+import { Layout, Card, Divider } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useBinanceWebSocket } from '@/hooks/useBinanceWebSocket';
 import { binanceApi } from '@/adaptor/biance';
@@ -9,14 +8,15 @@ import { Kline } from './Kline';
 import BookTicker from './BookTicker';
 import HistoricalOrders from './HistoricalOrders';
 import TradeForm from './TradeForm';
+import ExchangeHeader from './ExchangeHeader';
 
 type Token = 'ETHUSDT' | 'BTCUSDT' | 'SOLUSDT';
 
-const { Header, Content } = Layout;
+const { Content } = Layout;
 
 const Main: React.FC = () => {
   const { t } = useTranslation();
-  const { isConnected, connect, disconnect, error, trade, bookTicker } = useBinanceWebSocket();
+  const { isConnected, error, trade, bookTicker } = useBinanceWebSocket();
   const [selectedToken, setSelectedToken] = useState<Token>('ETHUSDT');
   const [usdtBalance, setUsdtBalance] = useState<number>(10000);
   const [selectedCoinBalance, setSelectedCoinBalance] = useState<number>(10);
@@ -66,54 +66,11 @@ const Main: React.FC = () => {
 
   return (
     <Layout className="exchange-layout">
-      <Header className="exchange-header">
-        <div className="header-content">
-          <div className="header-left">
-            <div className="main-controls" style={{ display: 'flex', alignItems: 'center', gap: '20px', marginLeft: '30px' }}>
-              <div className="symbol-selector" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ color: 'white' }}>{t('main.tradingPair')}:</span>
-                <Select
-                  value={selectedToken.toLowerCase()}
-                  onChange={handleSymbolChange}
-                  style={{ width: 150, backgroundColor: 'rgba(255,255,255,0.1)', borderColor: 'rgba(255,255,255,0.2)' }}
-                  options={[
-                    { value: 'ethusdt', label: 'ETH/USDT' },
-                    { value: 'btcusdt', label: 'BTC/USDT' },
-                    { value: 'solusdt', label: 'SOL/USDT' }
-                  ]}
-                  placeholder={t('main.selectPair')}
-                />
-              </div>
-              
-              <div className="connection-status" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                <Badge 
-                  status={isConnected ? 'success' : 'error'} 
-                  text={<span style={{ color: 'white' }}>{isConnected ? t('common.connected') : t('common.notConnected')}</span>} 
-                />
-                <div className="connection-controls">
-                  <Button 
-                    type="primary" 
-                    icon={<CaretRightOutlined />} 
-                    onClick={() => connect()} 
-                    disabled={isConnected}
-                    style={{ marginRight: '8px' }}
-                  >
-                    {t('common.connect')}
-                  </Button>
-                  <Button 
-                    danger 
-                    icon={<CloseOutlined />} 
-                    onClick={() => disconnect()} 
-                    disabled={!isConnected}
-                  >
-                    {t('common.disconnect')}
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </Header>
+      <ExchangeHeader
+        selectedToken={selectedToken}
+        isConnected={isConnected}
+        onSymbolChange={handleSymbolChange}
+      />
 
       <Content className="exchange-content">
         {error && (
