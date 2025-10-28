@@ -3,6 +3,66 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  
+  /* 深色主题 - 默认值 */
+  --bg-primary: #141414;
+  --bg-secondary: #0a0a0a;
+  --bg-tertiary: #1e1e1e;
+  --bg-card: #252525;
+  --bg-elevated: #2a2a2a;
+  --bg-hover: rgba(255, 255, 255, 0.06);
+  --bg-active: rgba(255, 255, 255, 0.12);
+  
+  --text-primary: #ffffff;
+  --text-secondary: #eaeaea;
+  --text-tertiary: #999999;
+  --text-disabled: #666666;
+  
+  --border-color: #333333;
+  --border-color-light: rgba(255, 255, 255, 0.1);
+  --border-color-hover: rgba(255, 255, 255, 0.2);
+  
+  --color-primary: #2196f3;
+  --color-primary-hover: #1976d2;
+  --color-success: #52c41a;
+  --color-success-bg: rgba(82, 196, 26, 0.1);
+  --color-danger: #f5222d;
+  --color-danger-bg: rgba(245, 34, 45, 0.1);
+  --color-warning: #faad14;
+  
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* 浅色主题 */
+[data-theme='light'] {
+  --bg-primary: #fafafa;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f5f7fb;
+  --bg-card: #ffffff;
+  --bg-elevated: #fafafa;
+  --bg-hover: rgba(0, 0, 0, 0.04);
+  --bg-active: rgba(0, 0, 0, 0.08);
+  
+  --text-primary: #1a1a1a;
+  --text-secondary: #2a2a2a;
+  --text-tertiary: #666666;
+  --text-disabled: #999999;
+  
+  --border-color: #e6e6e6;
+  --border-color-light: rgba(0, 0, 0, 0.06);
+  --border-color-hover: rgba(0, 0, 0, 0.15);
+  
+  --color-primary: #2196f3;
+  --color-primary-hover: #1976d2;
+  --color-success: #52c41a;
+  --color-success-bg: rgba(82, 196, 26, 0.1);
+  --color-danger: #f5222d;
+  --color-danger-bg: rgba(245, 34, 45, 0.1);
+  --color-warning: #faad14;
+  
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 * {
@@ -19,11 +79,11 @@ html, body, #root {
 
 /* 重置一些默认样式，让antd组件更好地适应深色主题 */
 a {
-  color: #2196f3;
+  color: var(--color-primary);
 }
 
 a:hover {
-  color: #1976d2;
+  color: var(--color-primary-hover);
 }
 
 /* 禁用按钮默认的outline样式 */
@@ -35,10 +95,10 @@ button:focus {
 
 /* 自定义额外样式 */
 .ant-table-tbody > tr:hover > td {
-  background-color: #2a2a2a !important;
+  background-color: var(--bg-elevated) !important;
 }
 
 .ant-input:focus,
 .ant-select-selector:focus {
-  box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2) !important;
+  box-shadow: 0 0 0 2px var(--color-primary) !important;
 }

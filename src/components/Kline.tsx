@@ -1,5 +1,6 @@
 import React from 'react';
 import { AdvancedRealTimeChart } from 'react-ts-tradingview-widgets';
+import './styles/common.css';
 
 type Token = 'ETHUSDT' | 'BTCUSDT' | 'SOLUSDT';
 
@@ -9,7 +10,7 @@ interface KlineProps {
 
 export const Kline: React.FC<KlineProps> = ({ token }) => {
   return (
-    <div style={{ height: '320px', width: '100%' }}>
+    <div className="kline-container">
       <AdvancedRealTimeChart
         symbol={token}
         theme="dark"

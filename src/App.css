@@ -12,8 +12,8 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #141414;
-  color: #eaeaea;
+  background-color: var(--bg-primary);
+  color: var(--text-secondary);
   margin: 0;
   padding: 0;
   height: 100vh;
@@ -28,9 +28,9 @@ body {
   width: 36px;
   height: 36px;
   border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.06);
-  color: #fff;
+  border: 1px solid var(--border-color-light);
+  background: var(--bg-hover);
+  color: var(--text-primary);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -40,120 +40,31 @@ body {
 }
 
 .theme-toggle:hover {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: rgba(255, 255, 255, 0.3);
+  background: var(--bg-active);
+  border-color: var(--border-color-hover);
 }
 
-[data-theme='light'] .theme-toggle {
-  border-color: rgba(0, 0, 0, 0.1);
-  background: rgba(255, 255, 255, 0.85);
-  color: #222;
-}
-
-[data-theme='light'] .theme-toggle:hover {
-  background: rgba(0, 0, 0, 0.04);
-  border-color: rgba(0, 0, 0, 0.15);
-}
-
-/* 浅色主题覆盖 */
-:root[data-theme='light'] body {
-  background-color: #fafafa;
-  color: #1a1a1a;
-}
-
-:root[data-theme='light'] .exchange-layout {
-  background-color: #ffffff;
-}
-
-:root[data-theme='light'] .exchange-header {
-  background-color: #ffffff;
-  border-bottom: 1px solid #e6e6e6;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-}
-
-:root[data-theme='light'] .exchange-title,
-:root[data-theme='light'] .header-left h3 {
-  color: #1a1a1a;
-}
-
-:root[data-theme='light'] .exchange-content,
-:root[data-theme='light'] .trade-page,
-:root[data-theme='light'] .orders-page,
-:root[data-theme='light'] .funds-page {
-  background-color: #f5f7fb;
-}
-
-:root[data-theme='light'] .exchange-card {
-  background-color: #ffffff;
-  border: 1px solid #eaecef;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-}
-
-:root[data-theme='light'] .exchange-card .ant-card-head {
-  background-color: #ffffff;
-  border-bottom: 1px solid #eef0f3;
-}
-
-:root[data-theme='light'] .exchange-card .ant-card-head-title {
-  color: #1a1a1a;
-}
-
-:root[data-theme='light'] .exchange-card .ant-card-body {
-  color: #2a2a2a;
-}
-
-:root[data-theme='light'] .exchange-tabs .ant-tabs-tab {
-  color: #666;
-}
-
-:root[data-theme='light'] .exchange-tabs .ant-tabs-tab-active {
-  color: #111;
-}
-
-:root[data-theme='light'] .exchange-tabs .ant-tabs-content {
-  background-color: transparent;
-}
-
-:root[data-theme='light'] .order-book-header,
-:root[data-theme='light'] .last-price {
-  border-color: #e8eaf0;
-}
-
-:root[data-theme='light'] .last-price {
-  background-color: #ffffff;
-  color: #1a1a1a;
-}
-
-:root[data-theme='light'] .symbol-selector select {
-  background-color: #ffffff;
-  border-color: #e5e7eb;
-  color: #111827;
-}
-
-:root[data-theme='light'] .controls button:disabled {
-  background-color: #e5e7eb;
-  color: #9ca3af;
-}
+/* 浅色主题覆盖 - 通过 CSS 变量自动处理，保留必要覆盖 */
 
 /* 组件级兜底（浅色） */
-:root[data-theme='light'] .ant-table-tbody > tr:hover > td {
-  background: #f5f7ff !important;
+[data-theme='light'] .ant-table-tbody > tr:hover > td {
+  background: var(--bg-hover) !important;
 }
 
-:root[data-theme='light'] .ant-table-tbody > tr.ant-table-row-selected > td {
-  background: #eaf2ff !important;
+[data-theme='light'] .ant-table-tbody > tr.ant-table-row-selected > td {
+  background: var(--bg-active) !important;
 }
 
-:root[data-theme='light'] .ant-select-dropdown {
-  background: #ffffff !important;
+[data-theme='light'] .ant-select-dropdown {
+  background: var(--bg-secondary) !important;
 }
 
-:root[data-theme='light'] .ant-select-item-option-active {
-  background: #f5f7ff !important;
+[data-theme='light'] .ant-select-item-option-active {
+  background: var(--bg-hover) !important;
 }
 
-:root[data-theme='light'] .ant-select-item-option-selected {
-  background: #eaf2ff !important;
+[data-theme='light'] .ant-select-item-option-selected {
+  background: var(--bg-active) !important;
 }
 
 /* 全局样式重置 */
@@ -173,16 +84,16 @@ body {
 /* 交易所布局样式 */
 .exchange-layout {
   height: 100vh;
-  background-color: #141414;
+  background-color: var(--bg-primary);
 }
 
 .exchange-header {
-  background-color: #0a0a0a;
+  background-color: var(--bg-secondary);
   padding: 0 24px;
   height: 64px;
   line-height: 64px;
-  border-bottom: 1px solid #333;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid var(--border-color);
+  box-shadow: var(--shadow-md);
 }
 
 .header-content {
@@ -200,7 +111,7 @@ body {
 }
 
 .exchange-title {
-  color: #ffffff;
+  color: var(--text-primary);
   margin: 0;
   font-size: 20px;
   font-weight: 600;
@@ -210,7 +121,7 @@ body {
   padding: 20px;
   overflow-y: auto;
   overflow-x: hidden; /* 避免出现横向滚动条 */
-  background-color: #141414;
+  background-color: var(--bg-primary);
   height: calc(100vh - 64px);
 }
 
@@ -260,42 +171,42 @@ body {
 
 /* 卡片样式 */
 .exchange-card {
-  background-color: #1e1e1e;
-  border: 1px solid #333;
+  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow-sm);
 }
 
 .exchange-card .ant-card-head {
-  background-color: #252525;
-  border-bottom: 1px solid #333;
+  background-color: var(--bg-card);
+  border-bottom: 1px solid var(--border-color);
 }
 
 .exchange-card .ant-card-head-title {
-  color: #ffffff;
+  color: var(--text-primary);
   font-weight: 500;
 }
 
 .exchange-card .ant-card-body {
-  color: #eaeaea;
+  color: var(--text-secondary);
 }
 
 /* Tabs样式 */
 .exchange-tabs .ant-tabs-tab {
-  color: #999;
+  color: var(--text-tertiary);
   font-weight: 500;
 }
 
 .exchange-tabs .ant-tabs-tab-active {
-  color: #ffffff;
+  color: var(--text-primary);
 }
 
 .exchange-tabs .ant-tabs-ink-bar {
-  background-color: #2196f3;
+  background-color: var(--color-primary);
 }
 
 .exchange-tabs .ant-tabs-content {
-  background-color: #141414;
+  background-color: var(--bg-primary);
   padding-top: 16px;
 }
 
@@ -303,7 +214,7 @@ body {
 .trade-page,
 .orders-page,
 .funds-page {
-  background-color: #141414;
+  background-color: var(--bg-primary);
 }
 
 /* 响应式设计 */
@@ -342,7 +253,7 @@ body {
   align-items: center;
   margin-bottom: 1rem;
   padding-bottom: 0.5rem;
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .header-left {
@@ -353,7 +264,7 @@ body {
 
 .header-left h3 {
   font-size: 1.2rem;
-  color: #ffffff;
+  color: var(--text-primary);
 }
 
 .symbol-selector {
@@ -364,11 +275,11 @@ body {
 
 .symbol-selector select {
   padding: 0.3rem 0.6rem;
-  border: 1px solid #444;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
   font-size: 0.9rem;
-  background-color: #252525;
-  color: #eaeaea;
+  background-color: var(--bg-card);
+  color: var(--text-secondary);
 }
 
 .connection-status {
@@ -376,7 +287,7 @@ body {
   align-items: center;
   gap: 0.5rem;
   font-size: 0.9rem;
-  color: #eaeaea;
+  color: var(--text-secondary);
 }
 
 .status-indicator {
@@ -387,35 +298,35 @@ body {
 }
 
 .status-indicator.connected {
-  background-color: #4caf50;
+  background-color: var(--color-success);
 }
 
 .status-indicator.disconnected {
-  background-color: #f44336;
+  background-color: var(--color-danger);
 }
 
 .last-price {
   margin-bottom: 1rem;
   padding: 0.5rem;
-  background-color: #1e1e1e;
+  background-color: var(--bg-tertiary);
   border-radius: 4px;
   font-size: 1rem;
-  color: #eaeaea;
+  color: var(--text-secondary);
 }
 
 .last-price strong {
-  color: #2196f3;
+  color: var(--color-primary);
   font-size: 1.2rem;
 }
 
 .error-message {
-  color: #f44336;
-  background-color: rgba(244, 67, 54, 0.1);
+  color: var(--color-danger);
+  background-color: var(--color-danger-bg);
   padding: 0.5rem;
   border-radius: 4px;
   margin-bottom: 1rem;
   font-size: 0.9rem;
-  border: 1px solid rgba(244, 67, 54, 0.3);
+  border: 1px solid var(--color-danger);
 }
 
 .controls {
@@ -434,17 +345,17 @@ body {
 }
 
 .controls button:not(:disabled) {
-  background-color: #2196f3;
-  color: white;
+  background-color: var(--color-primary);
+  color: var(--text-primary);
 }
 
 .controls button:hover:not(:disabled) {
-  background-color: #1976d2;
+  background-color: var(--color-primary-hover);
 }
 
 .controls button:disabled {
-  background-color: #444;
-  color: #9e9e9e;
+  background-color: var(--bg-elevated);
+  color: var(--text-disabled);
   cursor: not-allowed;
 }
 

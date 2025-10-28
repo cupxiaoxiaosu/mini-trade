@@ -1,6 +1,8 @@
 import React from 'react';
 import { Select, Badge, Layout } from 'antd';
 import { useTranslation } from 'react-i18next';
+import './styles/layout.css';
+import './styles/common.css';
 
 type Token = 'ETHUSDT' | 'BTCUSDT' | 'SOLUSDT';
 
@@ -23,13 +25,13 @@ const ExchangeHeader: React.FC<ExchangeHeaderProps> = ({
     <Header className="exchange-header">
       <div className="header-content">
         <div className="header-left">
-          <div className="main-controls" style={{ display: 'flex', gap: '20px' }}>
-            <div className="symbol-selector" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              
+          <div className="main-controls">
+            <div className="symbol-selector">
+              <span className="symbol-selector-label">{t('main.tradingPair')}:</span>
               <Select
+                className="symbol-selector-dropdown"
                 value={selectedToken.toLowerCase()}
                 onChange={onSymbolChange}
-                style={{ width: 150, backgroundColor: 'rgba(255,255,255,0.1)', borderColor: 'rgba(255,255,255,0.2)' }}
                 options={[
                   { value: 'ethusdt', label: 'ETH/USDT' },
                   { value: 'btcusdt', label: 'BTC/USDT' },
@@ -39,10 +41,10 @@ const ExchangeHeader: React.FC<ExchangeHeaderProps> = ({
               />
             </div>
             
-            <div className="connection-status" style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <div className="connection-status">
               <Badge 
                 status={isConnected ? 'success' : 'error'} 
-                text={<span style={{ color: 'white' }}>{isConnected ? t('common.connected') : t('common.notConnected')}</span>} 
+                text={<span className="connection-status-badge">{isConnected ? t('common.connected') : t('common.notConnected')}</span>} 
               />
             </div>
           </div>

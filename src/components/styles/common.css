@@ -1,0 +1,210 @@
+/* 通用样式类 */
+
+/* 布局相关 */
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.flex-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-row {
+  display: flex;
+  flex-direction: row;
+}
+
+.flex-wrap {
+  flex-wrap: wrap;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+/* 间距相关 */
+.margin-bottom-16 {
+  margin-bottom: 16px;
+}
+
+.margin-bottom-20 {
+  margin-bottom: 20px;
+}
+
+.margin-top-8 {
+  margin-top: 8px;
+}
+
+.margin-top-16 {
+  margin-top: 16px;
+}
+
+.margin-left-10 {
+  margin-left: 10px;
+}
+
+.padding-12 {
+  padding: 12px;
+}
+
+.padding-16 {
+  padding: 16px;
+}
+
+.padding-40 {
+  padding: 40px;
+}
+
+/* 文本相关 */
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-secondary {
+  color: var(--text-secondary);
+}
+
+.text-success {
+  color: var(--color-success);
+}
+
+.text-danger {
+  color: var(--color-danger);
+}
+
+.text-primary {
+  color: var(--color-primary);
+}
+
+.text-bold {
+  font-weight: bold;
+}
+
+.text-600 {
+  font-weight: 600;
+}
+
+.font-size-12 {
+  font-size: 12px;
+}
+
+.font-size-14 {
+  font-size: 14px;
+}
+
+.font-size-16 {
+  font-size: 16px;
+}
+
+.font-size-20 {
+  font-size: 20px;
+}
+
+/* 颜色相关 */
+.color-white {
+  color: var(--text-primary);
+}
+
+.color-green {
+  color: var(--color-success);
+}
+
+.color-red {
+  color: var(--color-danger);
+}
+
+.color-blue {
+  color: var(--color-primary);
+}
+
+.color-gray {
+  color: var(--text-tertiary);
+}
+
+/* 背景色相关 */
+.bg-success-light {
+  background-color: var(--color-success-bg);
+}
+
+.bg-danger-light {
+  background-color: var(--color-danger-bg);
+}
+
+.bg-primary-light {
+  background-color: var(--bg-hover);
+}
+
+.bg-gray-light {
+  background-color: var(--bg-elevated);
+}
+
+/* 边框相关 */
+.border-radius-4 {
+  border-radius: 4px;
+}
+
+.border-radius-8 {
+  border-radius: 8px;
+}
+
+/* 高度相关 */
+.height-44 {
+  height: 44px;
+}
+
+.height-48 {
+  height: 48px;
+}
+
+.height-200 {
+  height: 200px;
+}
+
+/* 宽度相关 */
+.width-100 {
+  width: 100%;
+}
+
+.width-150 {
+  width: 150px;
+}
+
+/* K线图容器 */
+.kline-container {
+  height: 320px;
+  width: 100%;
+}
+
+/* 重试按钮 */
+.retry-button {
+  border: none;
+  background-color: var(--color-primary);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+/* 主题相关 - 通过 CSS 变量自动处理 */
+
+/* 响应式相关 */
+@media (max-width: 768px) {
+  .mobile-hidden {
+    display: none;
+  }
+  
+  .mobile-full-width {
+    width: 100%;
+  }
+}

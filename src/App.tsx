@@ -2,6 +2,8 @@ import Main from './components/Main';
 import ThemeToggle from './components/ThemeToggle';
 import LanguageSwitcher from './components/LanguageSwitcher';
 import './App.css';
+import './components/styles/common.css';
+import './components/styles/app.css';
 import { useEffect, useMemo, useState } from 'react';
 import { ConfigProvider, theme as antdTheme } from 'antd';
 import { HashRouter } from 'react-router-dom';
@@ -82,7 +84,7 @@ function AppContent() {
       }}
     >
       <div className="app">
-        <div style={{ position: 'absolute', top: '16px', right: '16px', display: 'flex', gap: '12px', zIndex: 1000 }}>
+        <div className="app-controls">
           <LanguageSwitcher onLanguageChange={handleLanguageChange} />
           <ThemeToggle isDark={isDark} onToggle={toggleTheme} />
         </div>

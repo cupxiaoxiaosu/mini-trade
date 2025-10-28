@@ -3,6 +3,8 @@ import { Card, Statistic, Row, Col, Spin, Alert } from 'antd';
 import type { Balance } from '../adaptor/biance';
 import { binanceApi, getHistoricalOrders } from '../adaptor/biance';
 import { useTranslation } from 'react-i18next';
+import './styles/card.css';
+import './styles/common.css';
 
 const Balance: React.FC = () => {
   const { t } = useTranslation();
@@ -116,9 +118,9 @@ const Balance: React.FC = () => {
     <div>
       
       {loading && (
-        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px', flexDirection: 'column' }}>
+        <div className="flex-center height-200 flex-column">
           <Spin size="large" />
-          <div style={{ marginTop: '16px', fontSize: '16px', color: '#666' }}>{t('balance.fetchingBalance')}</div>
+          <div className="margin-top-16 font-size-16 text-secondary">{t('balance.fetchingBalance')}</div>
         </div>
       )}
       
@@ -128,18 +130,11 @@ const Balance: React.FC = () => {
           description={error}
           type="error"
           showIcon
-          style={{ marginBottom: '20px' }}
+          className="margin-bottom-20"
           action={
             <button
               onClick={fetchBalances}
-              style={{
-                border: 'none',
-                backgroundColor: '#1890FF',
-                color: 'white',
-                padding: '4px 15px',
-                borderRadius: '4px',
-                cursor: 'pointer'
-              }}
+              className="border-radius-4 padding-12 retry-button"
             >
               {t('common.retry')}
             </button>
@@ -151,7 +146,7 @@ const Balance: React.FC = () => {
         <>
           <Row gutter={[16, 16]}>
             <Col xs={24} md={12}>
-              <Card style={{ marginBottom: '20px' }} variant="outlined">
+              <Card className="statistic-card" variant="outlined">
                 <Statistic
                   value={getTotalBalance()}
                   precision={2}
@@ -163,11 +158,11 @@ const Balance: React.FC = () => {
               </Card>
             </Col>
             <Col xs={24} md={12}>
-              <Card style={{ marginBottom: '20px' }} variant="outlined">
+              <Card className="statistic-card" variant="outlined">
                 {plLoading ? (
-                  <div style={{ height: '80px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <div className="flex-center height-200">
                     <Spin size="small" />
-                    <span style={{ marginLeft: '8px' }}>{t('balance.calculating')}</span>
+                    <span className="margin-left-10">{t('balance.calculating')}</span>
                   </div>
                 ) : (
                   <>
@@ -179,8 +174,8 @@ const Balance: React.FC = () => {
                       suffix="USDT"
                       title={t('balance.totalProfitLoss')}
                     />
-                    <div style={{ marginTop: '8px', fontSize: '14px' }}>
-                      {t('balance.profitLossRate')} <span style={{ color: profitLoss.percent >= 0 ? '#52c41a' : '#f5222d' }}>
+                    <div className="margin-top-8 font-size-14">
+                      {t('balance.profitLossRate')} <span className={profitLoss.percent >= 0 ? 'text-success' : 'text-danger'}>
                         {profitLoss.percent >= 0 ? '+' : ''}{profitLoss.percent.toFixed(2)}%
                       </span>
                     </div>
@@ -197,6 +192,7 @@ const Balance: React.FC = () => {
                 <Col xs={24} sm={12} md={8} lg={6} key={balance.asset}>
                   <Card
                     hoverable
+                    className="balance-card"
                     style={{
                       backgroundColor: `${getTokenColor(balance.asset)}10`,
                       borderLeft: `4px solid ${getTokenColor(balance.asset)}`
@@ -209,7 +205,7 @@ const Balance: React.FC = () => {
                       valueStyle={{ color: getTokenColor(balance.asset) }}
                       suffix={balance.asset}
                     />
-                    <div style={{ marginTop: '8px', fontSize: '12px', color: '#999' }}>
+                    <div className="margin-top-8 font-size-12 text-secondary">
                       <div>{t('balance.available')}: {parseFloat(balance.free).toFixed(6)}</div>
                       <div>{t('balance.locked')}: {parseFloat(balance.locked).toFixed(6)}</div>
                     </div>

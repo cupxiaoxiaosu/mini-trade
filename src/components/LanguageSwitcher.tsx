@@ -1,6 +1,7 @@
 import React from 'react';
 import { Select } from 'antd';
 import { useTranslation } from 'react-i18next';
+import './styles/common.css';
 
 interface LanguageSwitcherProps {
   onLanguageChange?: (lang: string) => void;
@@ -18,13 +19,9 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ onLanguageChange })
 
   return (
     <Select
+      className="language-switcher"
       value={i18n.language}
       onChange={handleLanguageChange}
-      style={{ 
-        width: 100,
-        backgroundColor: 'rgba(255,255,255,0.1)',
-        borderColor: 'rgba(255,255,255,0.2)'
-      }}
       options={[
         { value: 'zh-CN', label: '中文' },
         { value: 'en-US', label: 'English' }

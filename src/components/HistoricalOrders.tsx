@@ -3,6 +3,8 @@ import { Table, Spin, Alert, Empty, Button } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useTranslation } from 'react-i18next';
 import { getHistoricalOrders, type Order } from '@/adaptor/biance';
+import './styles/table.css';
+import './styles/common.css';
 
 type HistoricalOrdersProps = {
   symbol?: 'ETHUSDT' | 'BTCUSDT' | 'SOLUSDT';
@@ -67,8 +69,9 @@ const HistoricalOrders: React.FC<HistoricalOrdersProps> = ({ symbol }) => {
       dataIndex: 'side',
       key: 'side',
       render: (side) => {
-        const color = side === 'BUY' ? 'green' : 'red';
-        return <span style={{ color }}>{side === 'BUY' ? t('orderBook.buy') : t('orderBook.sell')}</span>;
+        return <span className={side === 'BUY' ? 'trade-direction-buy' : 'trade-direction-sell'}>
+          {side === 'BUY' ? t('orderBook.buy') : t('orderBook.sell')}
+        </span>;
       },
     },
     {
@@ -125,23 +128,8 @@ const HistoricalOrders: React.FC<HistoricalOrdersProps> = ({ symbol }) => {
 
   return (
     <div className="historical-orders">
-      <div className="order-controls" style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: '16px', marginBottom: '8px' }}>
-        {/* <div style={{ fontWeight: 500 }}>{symbol ? `${symbol} 当前订单` : '全部订单'}</div> */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          {/* <div>
-            <label style={{ marginRight: '8px' }}>显示数量:</label>
-            <Select
-              value={limit}
-              onChange={(value) => setLimit(value)}
-              style={{ width: 100 }}
-              options={[
-                { value: 10, label: '10' },
-                { value: 20, label: '20' },
-                { value: 50, label: '50' },
-                { value: 100, label: '100' },
-              ]}
-            />
-          </div> */}
+      <div className="table-controls">
+        <div className="table-controls-left">
           <Button type="primary" onClick={fetchHistoricalOrders} loading={loading}>
             {t('common.refresh')}
           </Button>
@@ -149,7 +137,7 @@ const HistoricalOrders: React.FC<HistoricalOrdersProps> = ({ symbol }) => {
       </div>
       
       {loading && (
-        <div style={{ textAlign: 'center', padding: '40px 0' }}>
+        <div className="table-loading">
           <Spin tip={t('common.loading')} />
         </div>
       )}
@@ -160,7 +148,7 @@ const HistoricalOrders: React.FC<HistoricalOrdersProps> = ({ symbol }) => {
           description={error}
           type="error"
           showIcon
-          style={{ marginBottom: '16px' }}
+          className="table-error"
           action={
             <Button type="primary" size="small" onClick={fetchHistoricalOrders}>
               {t('common.retry')}
@@ -170,7 +158,7 @@ const HistoricalOrders: React.FC<HistoricalOrdersProps> = ({ symbol }) => {
       )}
       
       {!loading && !error && orders.length === 0 && (
-        <Empty description={t('historicalOrders.noOrders')} style={{ padding: '40px 0' }} />
+        <Empty description={t('historicalOrders.noOrders')} className="table-empty" />
       )}
       
       {!loading && !error && orders.length > 0 && (

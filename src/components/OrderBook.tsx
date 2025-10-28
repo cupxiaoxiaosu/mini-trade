@@ -3,6 +3,8 @@ import { Table } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useTranslation } from 'react-i18next';
 import type { TradeData } from '@/adaptor/biance';
+import './styles/table.css';
+import './styles/common.css';
 
 type Token = 'ETHUSDT' | 'BTCUSDT' | 'SOLUSDT';
 
@@ -59,7 +61,7 @@ export const OrderBook: React.FC<OrderBookProps> = ({ data, token }) => {
       key: 'side',
       dataIndex: 'm',
       render: (isSell: boolean) => (
-        <span style={{ color: isSell ? '#f5222d' : '#52c41a' }}>
+        <span className={isSell ? 'trade-direction-sell' : 'trade-direction-buy'}>
           {isSell ? t('orderBook.sell') : t('orderBook.buy')}
         </span>
       ),

@@ -9,6 +9,9 @@ import BookTicker from './BookTicker';
 import HistoricalOrders from './HistoricalOrders';
 import TradeForm from './TradeForm';
 import ExchangeHeader from './ExchangeHeader';
+import './styles/layout.css';
+import './styles/card.css';
+import './styles/common.css';
 
 type Token = 'ETHUSDT' | 'BTCUSDT' | 'SOLUSDT';
 
@@ -74,7 +77,7 @@ const Main: React.FC = () => {
 
       <Content className="exchange-content">
         {error && (
-          <div className="error-message" style={{ marginBottom: '16px' }}>
+          <div className="error-message margin-bottom-16">
             {t('common.error')}: {error.message}
           </div>
         )}
@@ -88,14 +91,14 @@ const Main: React.FC = () => {
             className="exchange-card grid-row-1-right" 
             variant="outlined"
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14 }}>
-              <span>{coinSymbol}</span>
-              <span style={{ fontWeight: 600 }}>{selectedCoinBalance.toFixed(6)}</span>
+            <div className="balance-display">
+              <span className="balance-symbol">{coinSymbol}</span>
+              <span className="balance-value">{selectedCoinBalance.toFixed(6)}</span>
             </div>
-            <Divider style={{ margin: '12px 0' }} />
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14 }}>
-              <span>USDT</span>
-              <span style={{ fontWeight: 600 }}>{usdtBalance.toFixed(2)}</span>
+            <Divider className="balance-divider" />
+            <div className="balance-display">
+              <span className="balance-symbol">USDT</span>
+              <span className="balance-value">{usdtBalance.toFixed(2)}</span>
             </div>
           </Card>
 
@@ -115,9 +118,9 @@ const Main: React.FC = () => {
               className="exchange-card" 
               variant="outlined"
               extra={
-                <div style={{ textAlign: 'right', lineHeight: 1.3 }}>
-                  <div style={{ fontSize: 12, color: 'var(--text-secondary, #8c8c8c)' }}>{t('main.latestPrice')}</div>
-                  <div style={{ fontWeight: 700 }}>
+                <div className="latest-price-container">
+                  <div className="latest-price-label">{t('main.latestPrice')}</div>
+                  <div className="latest-price-value">
                     {(() => {
                       const tickerData = bookTicker[selectedToken];
                       if (tickerData) {
@@ -132,7 +135,7 @@ const Main: React.FC = () => {
                 </div>
               }
             >
-              <div style={{ paddingTop: 4 }}>
+              <div className="trade-form-container">
                 <TradeForm 
                   selectedToken={selectedToken} 
                   onOrderCreated={handleOrderCreated}
@@ -157,7 +160,7 @@ const Main: React.FC = () => {
               title={t('main.currentOrders')} 
               className="exchange-card" 
               variant="outlined"
-              extra={<div style={{ fontSize: 12, color: 'var(--text-secondary, #8c8c8c)' }}>{t('main.recentRecords')}</div>}
+              extra={<div className="card-extra">{t('main.recentRecords')}</div>}
             >
               <HistoricalOrders key={`orders-${refreshKey}`} symbol={selectedToken} />
             </Card>

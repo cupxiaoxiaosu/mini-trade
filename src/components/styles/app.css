@@ -1,0 +1,14 @@
+/* App 顶部控制栏样式 */
+.app-controls {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: flex;
+  gap: 12px;
+  z-index: 1000;
+}
+
+/* 主题适配 */
+[data-theme='dark'] .app-controls {
+  /* 深色主题下的样式调整 */
+}

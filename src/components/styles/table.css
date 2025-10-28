@@ -1,0 +1,91 @@
+/* 表格相关样式 */
+
+/* 表格容器 */
+.table-container {
+  width: 100%;
+}
+
+/* 表格控制栏 */
+.table-controls {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.table-controls-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* 加载状态 */
+.table-loading {
+  text-align: center;
+  padding: 40px 0;
+}
+
+/* 空状态 */
+.table-empty {
+  padding: 40px 0;
+}
+
+/* 错误状态 */
+.table-error {
+  margin-bottom: 16px;
+}
+
+/* 表格列样式 */
+.table-column-price {
+  font-family: 'Courier New', monospace;
+}
+
+.table-column-quantity {
+  font-family: 'Courier New', monospace;
+}
+
+.table-column-amount {
+  font-family: 'Courier New', monospace;
+}
+
+/* 交易方向样式 */
+.trade-direction-buy {
+  color: var(--color-success);
+}
+
+.trade-direction-sell {
+  color: var(--color-danger);
+}
+
+/* 状态标签 */
+.status-new {
+  color: var(--color-primary);
+}
+
+.status-filled {
+  color: var(--color-success);
+}
+
+.status-partially-filled {
+  color: var(--color-warning);
+}
+
+.status-canceled {
+  color: var(--text-tertiary);
+}
+
+.status-rejected {
+  color: var(--color-danger);
+}
+
+/* 主题适配 */
+[data-theme='dark'] .table-loading,
+[data-theme='light'] .table-loading {
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .table-empty,
+[data-theme='light'] .table-empty {
+  color: var(--text-primary);
+}

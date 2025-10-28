@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Form, Input, Button, message, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { createOrder, OrderSide, OrderType, TimeInForce, type NewOrderParams } from '@/adaptor/biance';
+import './styles/trade.css';
+import './styles/common.css';
 
 type Token = 'ETHUSDT' | 'BTCUSDT' | 'SOLUSDT';
 
@@ -181,46 +183,17 @@ const TradeForm: React.FC<TradeFormProps> = ({
 
   return (
     <>
-      {/* 交易对和价格 */}
-      {/* <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-        <Title level={4} style={{ margin: 0 }}>{coinSymbol}/USDT</Title>
-        <div style={{ textAlign: 'right' }}>
-          <Text style={{ fontSize: 14, color: '#8c8c8c' }}>最新价格</Text>
-          <div style={{ fontSize: 20, fontWeight: 'bold', color: currentPrice > 0 ? '#1976d2' : '#8c8c8c' }}>
-            {currentPrice > 0 ? currentPrice.toFixed(2) : '--'} USDT
-          </div>
-        </div>
-      </div> */}
-      
       {/* 下划线切换按钮 */}
-      <div >
-        <div style={{ display: 'flex', width: '100%' }}>
+      <div>
+        <div className="trade-tabs">
           <div
-            style={{
-              flex: 1,
-              textAlign: 'center',
-              padding: '10px 0',
-              cursor: 'pointer',
-              fontSize: 16,
-              fontWeight: 'bold',
-              color: side === 'BUY' ? '#52c41a' : '#8c8c8c',
-              borderBottom: side === 'BUY' ? '3px solid #52c41a' : 'none'
-            }}
+            className={`trade-tab trade-tab-buy ${side === 'BUY' ? 'active' : ''}`}
             onClick={() => handleSideChange('BUY')}
           >
             {t('tradeForm.buy')}
           </div>
           <div
-            style={{
-              flex: 1,
-              textAlign: 'center',
-              padding: '10px 0',
-              cursor: 'pointer',
-              fontSize: 16,
-              fontWeight: 'bold',
-              color: side === 'SELL' ? '#f5222d' : '#8c8c8c',
-              borderBottom: side === 'SELL' ? '3px solid #f5222d' : 'none'
-            }}
+            className={`trade-tab trade-tab-sell ${side === 'SELL' ? 'active' : ''}`}
             onClick={() => handleSideChange('SELL')}
           >
             {t('tradeForm.sell')}
@@ -228,29 +201,29 @@ const TradeForm: React.FC<TradeFormProps> = ({
         </div>
         
         {/* 余额显示 */}
-        <div style={{ textAlign: 'right', marginTop: 8, fontSize: 14 }}>
+        <div className="balance-info">
           {side === 'BUY' ? (
             <>
-              <Text style={{ color: '#8c8c8c' }}>{t('tradeForm.available')} USDT: </Text>
-              <Text style={{ color: '#52c41a', fontWeight: 'bold' }}>{balance.toFixed(2)}</Text>
+              <Text className="text-secondary">{t('tradeForm.available')} USDT: </Text>
+              <Text className="text-success text-bold">{balance.toFixed(2)}</Text>
               {currentPrice > 0 && (
                 <>
-                  <Text style={{ color: '#8c8c8c', marginLeft: 10 }}>{t('tradeForm.maxCanBuy')}: </Text>
-                  <Text style={{ color: '#1976d2', fontWeight: 'bold' }}>
+                  <Text className="text-secondary margin-left-10">{t('tradeForm.maxCanBuy')}: </Text>
+                  <Text className="text-primary text-bold">
                     {(balance / currentPrice).toFixed(6)}
                   </Text>
-                  <Text style={{ color: '#8c8c8c' }}> {coinSymbol}</Text>
+                  <Text className="text-secondary"> {coinSymbol}</Text>
                 </>
               )}
             </>
           ) : (
             <>
-              <Text style={{ color: '#8c8c8c' }}>{t('tradeForm.available')} {coinSymbol}: </Text>
-              <Text style={{ color: '#52c41a', fontWeight: 'bold' }}>{coinBalance.toFixed(6)}</Text>
+              <Text className="text-secondary">{t('tradeForm.available')} {coinSymbol}: </Text>
+              <Text className="text-success text-bold">{coinBalance.toFixed(6)}</Text>
               {currentPrice > 0 && (
                 <>
-                  <Text style={{ color: '#8c8c8c', marginLeft: 10 }}>{t('tradeForm.canSellUSD')} </Text>
-                  <Text style={{ color: '#1976d2', fontWeight: 'bold' }}>
+                  <Text className="text-secondary margin-left-10">{t('tradeForm.canSellUSD')} </Text>
+                  <Text className="text-primary text-bold">
                     {(coinBalance * currentPrice).toFixed(2)}
                   </Text>
                 </>
@@ -268,41 +241,6 @@ const TradeForm: React.FC<TradeFormProps> = ({
           // 移除side的初始化，避免可能的冲突
         }}
       >
-        {/* 订单类型 */}
-        {/* <Form.Item label="订单类型" name="orderType" rules={[{ required: true }]}>
-          <Radio.Group buttonStyle="solid" style={{ width: '100%' }}>
-            <Radio.Button value="MARKET" style={{ flex: 1 }}>市价单</Radio.Button>
-            <Radio.Button value="LIMIT" style={{ flex: 1 }}>限价单</Radio.Button>
-          </Radio.Group>
-        </Form.Item> */}
-
-        {/* 价格输入 */}
-        {/* <Form.Item
-          shouldUpdate={(prevValues, currentValues) => prevValues.orderType !== currentValues.orderType}
-        >
-          {({ getFieldValue }) => {
-            if (getFieldValue('orderType') === 'LIMIT') {
-              return (
-                <Form.Item label="价格" name="price" rules={[{ required: true }]}>
-                  <Input
-                    placeholder="请输入价格"
-                    type="number"
-                    min={0}
-                    step="any"
-                    style={{ borderRadius: 4, height: 44, fontSize: 16 }}
-                  />
-                  {currentPrice > 0 && (
-                    <Text type="secondary" style={{ marginTop: '4px', display: 'block' }}>
-                      当前市场价格: {currentPrice.toFixed(2)} USDT
-                    </Text>
-                  )}
-                </Form.Item>
-              );
-            }
-            return null;
-          }}
-        </Form.Item> */}
-
         {/* 数量输入 */}
         <Form.Item label={t('tradeForm.quantity')} name="quantity" rules={[{ required: true }]}>
           <div>
@@ -311,7 +249,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
               type="number" 
               min="0.00000001" 
               step="any"
-              style={{ borderRadius: 4, height: 44, fontSize: 16 }}
+              className="border-radius-4 height-44 font-size-16"
               value={quantity}
               onChange={(e) => {
                 form.setFieldValue('quantity', e.target.value);
@@ -320,18 +258,13 @@ const TradeForm: React.FC<TradeFormProps> = ({
             />
             
             {/* 快捷百分比按钮 */}
-            <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
+            <div className="quick-buttons">
               {[25, 50, 75, 100].map((percent) => (
                 <Button 
                   key={percent}
                   size="small" 
                   onClick={() => quickSelectQuantity(percent)}
-                  style={{
-                    flex: 1,
-                    backgroundColor: quantityPercentage === percent ? '#1890ff' : 'transparent',
-                    borderColor: quantityPercentage === percent ? '#1890ff' : '#d9d9d9',
-                    color: quantityPercentage === percent ? 'white' : '#333'
-                  }}
+                  className={`quick-button ${quantityPercentage === percent ? 'active' : ''}`}
                   disabled={loading}
                 >
                   {percent}%
@@ -340,12 +273,12 @@ const TradeForm: React.FC<TradeFormProps> = ({
             </div>
             
             {/* 交易信息 */}
-            <div style={{ marginTop: '4px', fontSize: 12, color: '#8c8c8c' }}>
+            <div className="trade-info">
               {t('tradeForm.currentSelect')}: {quantityPercentage}%
             </div>
             
             {form.getFieldValue('quantity') && (
-              <div style={{ marginTop: '4px', fontSize: 12, color: '#1890ff' }}>
+              <div className="trade-info-highlight">
                 {side === 'BUY' ? 
                   `${t('tradeForm.investment')} $${calculateInvestment().toFixed(2)} (${quantityPercentage}% ${t('tradeForm.availableBalance')})` : 
                   t('tradeForm.sellCanGet', { quantity: form.getFieldValue('quantity'), coin: coinSymbol })+`: $${calculateInvestment().toFixed(2)}`
@@ -356,18 +289,18 @@ const TradeForm: React.FC<TradeFormProps> = ({
         </Form.Item>
 
         {/* 订单摘要 */}
-        <div style={{ padding: '12px', backgroundColor: '#f5f5f5', borderRadius: 4, marginBottom: 16 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14 }}>
-            <Text style={{ color: '#8c8c8c' }}>
+        <div className="order-summary">
+          <div className="order-summary-row">
+            <Text className="text-secondary">
               {side === 'BUY' ? t('tradeForm.expectedTotal') : t('tradeForm.expectedGet')}
             </Text>
-            <Text style={{ fontWeight: 'bold', color: '#1976d2' }}>
+            <Text className="text-primary text-bold">
               {calculateInvestment().toFixed(2)} USDT
             </Text>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 14, marginTop: 4 }}>
-            <Text style={{ color: '#8c8c8c' }}>{t('tradeForm.availableBalance')}</Text>
-            <Text style={{ color: '#52c41a' }}>
+          <div className="order-summary-row">
+            <Text className="text-secondary">{t('tradeForm.availableBalance')}</Text>
+            <Text className="text-success">
               {side === 'BUY' ? `${balance.toFixed(2)} USDT` : `${coinBalance.toFixed(6)} ${coinSymbol}`}
             </Text>
           </div>
@@ -389,14 +322,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
                 console.log('表单验证失败:', info);
               });
             }}
-            style={{
-              width: '100%',
-              height: 48,
-              fontSize: 16,
-              fontWeight: 'bold',
-              backgroundColor: side === 'BUY' ? '#52c41a' : '#f5222d',
-              borderColor: side === 'BUY' ? '#52c41a' : '#f5222d'
-            }}
+            className={`submit-button ${side === 'BUY' ? 'submit-button-buy' : 'submit-button-sell'}`}
           >
             {loading ? 
               (side === 'BUY' ? t('tradeForm.buying') : t('tradeForm.selling')) : 

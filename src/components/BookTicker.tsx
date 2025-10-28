@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, Row, Col, Statistic } from 'antd';
 import { useTranslation } from 'react-i18next';
 import type { BookTickerData } from '@/adaptor/biance';
+import './styles/common.css';
 
 type Token = 'ETHUSDT' | 'BTCUSDT' | 'SOLUSDT';
 
@@ -10,7 +11,7 @@ interface BookTickerProps {
   token: Token;
 }
 
-const BookTicker: React.FC<BookTickerProps> = ({ data, token }) => {
+const BookTicker: React.FC<BookTickerProps> = ({ data }) => {
   const { t } = useTranslation();
   return (
     <div>  {data ? (
@@ -29,7 +30,7 @@ const BookTicker: React.FC<BookTickerProps> = ({ data, token }) => {
               <Statistic 
                 value={parseFloat(data.B || '0')} 
                 precision={8}
-                valueStyle={{ color: '#52c41a', fontSize: '20px', fontWeight: 'bold' }}
+                valueStyle={{ color: '#52c41a', fontSize: '16px', fontWeight: 'bold' }}
               />
             </Card>
           </Col>
@@ -47,13 +48,13 @@ const BookTicker: React.FC<BookTickerProps> = ({ data, token }) => {
               <Statistic 
                 value={parseFloat(data.A || '0')} 
                 precision={8}
-                valueStyle={{ color: '#f5222d', fontSize: '20px', fontWeight: 'bold' }}
+                valueStyle={{ color: '#f5222d', fontSize: '16px', fontWeight: 'bold' }}
               />
             </Card>
           </Col>
         </Row>
       ) : (
-        <div style={{ textAlign: 'center', padding: '40px 0', color: '#8c8c8c' }}>
+        <div className="no-data-container">
           {t('bookTicker.noData')}
         </div>
       )}
