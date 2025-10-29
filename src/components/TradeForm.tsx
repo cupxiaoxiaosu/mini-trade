@@ -171,39 +171,10 @@ const TradeForm: React.FC<TradeFormProps> = ({
         </div>
         
         {/* 余额显示 */}
-        <div className="balance-info">
-          {side === 'BUY' ? (
-            <>
-              <Text className="text-secondary">{t('tradeForm.available')} USDT: </Text>
-              <Text className="text-success text-bold">{balance.toFixed(2)}</Text>
-              {currentPrice > 0 && (
-                <>
-                  <Text className="text-secondary margin-left-10">{t('tradeForm.maxCanBuy')}: </Text>
-                  <Text className="text-primary text-bold">
-                    {(balance / currentPrice).toFixed(6)}
-                  </Text>
-                  <Text className="text-secondary"> {coinSymbol}</Text>
-                </>
-              )}
-            </>
-          ) : (
-            <>
-              <Text className="text-secondary">{t('tradeForm.available')} {coinSymbol}: </Text>
-              <Text className="text-success text-bold">{coinBalance.toFixed(6)}</Text>
-              {currentPrice > 0 && (
-                <>
-                  <Text className="text-secondary margin-left-10">{t('tradeForm.canSellUSD')} </Text>
-                  <Text className="text-primary text-bold">
-                    {(coinBalance * currentPrice).toFixed(2)}
-                  </Text>
-                </>
-              )}
-            </>
-          )}
-        </div>
       </div>
       
       <Form
+        style={{ marginTop: '16px' }}
         form={form}
         layout="horizontal"
         initialValues={{
@@ -212,7 +183,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
         }}
       >
         {/* 订单类型选择 */}
-        <Form.Item label={t('tradeForm.orderType')} name="orderType" rules={[{ required: true }]}>
+        <Form.Item  name="orderType" rules={[{ required: true }]}>
           <Radio.Group 
             value={orderType} 
             onChange={(e) => setOrderType(e.target.value)}
@@ -270,7 +241,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
         )}
 
         {/* 数量输入 */}
-        <Form.Item label={t('tradeForm.quantity')} name="quantity" rules={[{ required: true }]}>
+        <Form.Item  name="quantity" rules={[{ required: true }]}>
           <div>
             <Input 
               placeholder={t('tradeForm.enterQuantity', { coin: coinSymbol })} 
@@ -301,11 +272,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
               ))}
             </div>
             
-            {/* 交易信息 */}
-            <div className="trade-info">
-              {t('tradeForm.currentSelect')}: {quantityPercentage}%
-            </div>
-            
+       
             {form.getFieldValue('quantity') && (
               <div className="trade-info-highlight">
                 {investmentLoading ? (
@@ -346,6 +313,19 @@ const TradeForm: React.FC<TradeFormProps> = ({
               {side === 'BUY' ? `${balance.toFixed(2)} USDT` : `${coinBalance.toFixed(6)} ${coinSymbol}`}
             </Text>
           </div>
+          {currentPrice > 0 && (
+            <div className="order-summary-row">
+              <Text className="text-secondary">
+                {side === 'BUY' ? t('tradeForm.maxCanBuy') : t('tradeForm.canSellUSD')}
+              </Text>
+              <Text className="text-primary text-bold">
+                {side === 'BUY' 
+                  ? `${(balance / currentPrice).toFixed(6)} ${coinSymbol}`
+                  : `${(coinBalance * currentPrice).toFixed(2)} USDT`
+                }
+              </Text>
+            </div>
+          )}
         </div>
         
         {/* 提交按钮 */}

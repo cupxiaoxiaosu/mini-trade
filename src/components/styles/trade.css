@@ -37,15 +37,27 @@
 /* 余额显示 */
 .balance-info {
   text-align: right;
-  margin-top: 8px;
+  margin-top: 12px;
+  margin-bottom: 16px;
   font-size: 14px;
+  line-height: 1.6;
+  word-spacing: 4px;
+}
+
+.balance-info .ant-typography {
+  margin-right: 8px;
+}
+
+.balance-info .ant-typography:last-child {
+  margin-right: 0;
 }
 
 /* 快捷按钮组 */
 .quick-buttons {
   display: flex;
-  gap: 8px;
-  margin-top: 8px;
+  gap: 12px;
+  margin-top: 12px;
+  margin-bottom: 8px;
 }
 
 .quick-button {
@@ -63,33 +75,48 @@
 
 /* 交易信息 */
 .trade-info {
-  margin-top: 4px;
-  font-size: 12px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  font-size: 13px;
   color: var(--text-tertiary);
+  line-height: 1.5;
 }
 
 .trade-info-highlight {
-  margin-top: 4px;
-  font-size: 12px;
+  margin-top: 8px;
+  margin-bottom: 4px;
+  font-size: 13px;
   color: var(--color-primary);
+  line-height: 1.6;
+}
+
+.trade-info-highlight .text-danger {
+  margin-top: 6px;
+  display: block;
 }
 
 /* 订单摘要 */
 .order-summary {
-  padding: 12px;
+  padding: 16px;
   background-color: var(--bg-elevated);
   border-radius: 4px;
-  margin-bottom: 16px;
+  margin-top: 16px;
+  margin-bottom: 20px;
 }
 
 .order-summary-row {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   font-size: 14px;
+  line-height: 1.8;
+  min-height: 24px;
 }
 
 .order-summary-row + .order-summary-row {
-  margin-top: 4px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-color);
 }
 
 /* 提交按钮 */
@@ -122,7 +149,27 @@
 
 /* 价格提示 */
 .price-hint {
-  margin-top: 4px;
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+/* 表单整体间距优化 */
+.ant-form-horizontal .ant-form-item {
+  margin-bottom: 20px;
+}
+
+.ant-form-horizontal .ant-form-item:last-child {
+  margin-bottom: 0;
+}
+
+/* 数量输入区域的段落结构 */
+.ant-form-item-control-input-content > div {
+  margin-bottom: 0;
+}
+
+/* 余额信息文字间距 */
+.balance-info span {
+  display: inline-block;
 }
 
 /* 表单横向布局样式 */
@@ -135,9 +182,4 @@
 .ant-form-item-control-input-content {
   display: flex;
   flex-direction: column;
-}
-
-/* 快捷按钮容器宽度 */
-.quick-buttons {
-  margin-top: 8px;
 }

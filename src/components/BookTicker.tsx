@@ -20,8 +20,8 @@ const BookTicker: React.FC<BookTickerProps> = ({ data }) => {
             <Card size="small" title={t('bookTicker.bidPrice')} variant="outlined">
               <Statistic 
                 value={parseFloat(data.b || '0')} 
-                precision={8}
-                valueStyle={{ color: '#52c41a', fontSize: '20px', fontWeight: 'bold' }}
+                precision={4}
+                valueStyle={{ color: '#52c41a', fontSize: '18px', fontWeight: 'bold' }}
               />
             </Card>
           </Col>
@@ -29,8 +29,8 @@ const BookTicker: React.FC<BookTickerProps> = ({ data }) => {
             <Card size="small" title={t('bookTicker.bidQuantity')} variant="outlined">
               <Statistic 
                 value={parseFloat(data.B || '0')} 
-                precision={8}
-                valueStyle={{ color: '#52c41a', fontSize: '16px', fontWeight: 'bold' }}
+                precision={4}
+                valueStyle={{ color: '#52c41a', fontSize: '18px', fontWeight: 'bold' }}
               />
             </Card>
           </Col>
@@ -38,8 +38,8 @@ const BookTicker: React.FC<BookTickerProps> = ({ data }) => {
             <Card size="small" title={t('bookTicker.askPrice')} variant="outlined">
               <Statistic 
                 value={parseFloat(data.a || '0')} 
-                precision={8}
-                valueStyle={{ color: '#f5222d', fontSize: '20px', fontWeight: 'bold' }}
+                precision={4}
+                valueStyle={{ color: '#f5222d', fontSize: '18px', fontWeight: 'bold' }}
               />
             </Card>
           </Col>
@@ -47,8 +47,8 @@ const BookTicker: React.FC<BookTickerProps> = ({ data }) => {
             <Card size="small" title={t('bookTicker.askQuantity')} variant="outlined">
               <Statistic 
                 value={parseFloat(data.A || '0')} 
-                precision={8}
-                valueStyle={{ color: '#f5222d', fontSize: '16px', fontWeight: 'bold' }}
+                precision={4}
+                valueStyle={{ color: '#f5222d', fontSize: '18px', fontWeight: 'bold' }}
               />
             </Card>
           </Col>
