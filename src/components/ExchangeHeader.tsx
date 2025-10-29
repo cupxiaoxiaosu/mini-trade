@@ -26,8 +26,8 @@ const ExchangeHeader: React.FC<ExchangeHeaderProps> = ({
       <div className="header-content">
         <div className="header-left">
           <div className="main-controls">
+            <div>Mini Trade</div>
             <div className="symbol-selector">
-              <span className="symbol-selector-label">{t('main.tradingPair')}:</span>
               <Select
                 className="symbol-selector-dropdown"
                 value={selectedToken.toLowerCase()}

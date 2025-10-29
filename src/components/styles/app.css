@@ -6,6 +6,7 @@
   display: flex;
   gap: 12px;
   z-index: 1000;
+  width: 112px;
 }
 
 /* 主题适配 */
