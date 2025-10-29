@@ -109,3 +109,35 @@
   background-color: var(--color-danger);
   border-color: var(--color-danger);
 }
+
+/* 订单类型选择器 */
+.order-type-group {
+  width: 100%;
+}
+
+.order-type-button {
+  flex: 1;
+  text-align: center;
+}
+
+/* 价格提示 */
+.price-hint {
+  margin-top: 4px;
+}
+
+/* 表单横向布局样式 */
+.ant-form-horizontal .ant-form-item-label {
+  flex: 0 0 100px;
+  text-align: left;
+}
+
+/* 数量输入框容器 */
+.ant-form-item-control-input-content {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 快捷按钮容器宽度 */
+.quick-buttons {
+  margin-top: 8px;
+}

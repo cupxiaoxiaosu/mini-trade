@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, message, Typography } from 'antd';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Form, Input, Button, message, Typography, Radio } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { createOrder, OrderSide, OrderType, TimeInForce, type NewOrderParams } from '@/adaptor/biance';
 import './styles/trade.css';
@@ -27,84 +27,47 @@ const TradeForm: React.FC<TradeFormProps> = ({
   const { t } = useTranslation();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
-  const [quantityPercentage, setQuantityPercentage] = useState(0);
-  
+  const [quantity, setQuantity] = useState(0);
+  const [orderType, setOrderType] = useState<'MARKET' | 'LIMIT'>('MARKET');
+  const [price, setPrice] = useState(0);
+  const [side, setSide] = useState<'BUY' | 'SELL'>('BUY');
+  // 使用 useMemo 缓存 quantity 计算，避免重复渲染
+  const quantityPercentage = useMemo(() => {
+    return side === 'BUY' ? (balance * quantity / 100) / currentPrice : (coinBalance * quantity / 100);
+  }, [side, quantity, balance, currentPrice, coinBalance]);
 
   
-  const quantity = form.getFieldValue('side') === 'BUY' ? (balance * quantityPercentage / 100) / currentPrice : (coinBalance * quantityPercentage / 100);
-
-  const quickSelectQuantity = (percentage: number) => {
-    const precision = selectedToken.includes('BTC') ? 6 : 4;
-    const quantityStr = quantity.toFixed(precision);
-    // 确保数量值立即更新到表单中
-    form.setFieldsValue({ quantity: quantityStr });
-    
-    // 同时更新百分比状态
-    setQuantityPercentage(percentage);
-    
-    console.log(`已选择${percentage}%，数量设置为: ${quantityStr}`);
-  };
-  
-  // 处理数量变化，更新百分比
-  const handleQuantityChange = (value: string) => {
-    const side = form.getFieldValue('side');
-    const quantity = parseFloat(value) || 0;
-    const price = currentPrice || 1;
-    
-    let maxQuantity = 0;
-    if (side === 'BUY') {
-      maxQuantity = balance / price;
-    } else {
-      maxQuantity = coinBalance;
-    }
-    
-    if (maxQuantity > 0) {
-      const percentage = (quantity / maxQuantity) * 100;
-      // 检查是否接近预设百分比
-      if (Math.abs(percentage - 25) < 1) setQuantityPercentage(25);
-      else if (Math.abs(percentage - 50) < 1) setQuantityPercentage(50);
-      else if (Math.abs(percentage - 75) < 1) setQuantityPercentage(75);
-      else if (Math.abs(percentage - 100) < 1) setQuantityPercentage(100);
-      else setQuantityPercentage(Math.round(percentage));
-    }
-  };
+  console.log('quantityPercentage', balance, coinBalance,balance * quantity / 100 , currentPrice);
 
   // 计算投入金额
-  const calculateInvestment = () => {
-    const quantity = parseFloat(form.getFieldValue('quantity') || '0');
-    return quantity * (form.getFieldValue('price') || currentPrice || 1);
-  };
+
   
-  // 切换买卖方向
-  const handleSideChange = (newSide: string) => {
-    console.log('切换买卖方向:', newSide);
-    // 更新表单中的side字段
-    form.setFieldValue('side', newSide);
-    setQuantityPercentage(0);
-    form.setFieldValue('quantity', '');
-  };
+  const calculateInvestment = useMemo(() => {
+    const v = (orderType === 'LIMIT' ? price : currentPrice) * quantity;
+    return v.toFixed(2);
+  }, [orderType, price, currentPrice, quantity]);
+
   
+
   // 提交订单
-  const handleSubmit = async (values: any) => {
+  const handleSubmit = async () => {
     setLoading(true);
     
     try {
       console.log('开始处理订单提交...');
       
       // 1. 获取和验证交易参数
-      const quantity = parseFloat(values.quantity);
-      const orderPrice = values.orderType === 'LIMIT' ? parseFloat(values.price) : currentPrice;
+      const orderPrice = orderType === 'LIMIT' ? price : currentPrice;
       
       console.log('交易参数:', {
         symbol: selectedToken,
-        side: values.side,
-        type: values.orderType,
+        side,
         quantity: quantity,
         price: orderPrice
       });
       
       // 2. 检查余额是否充足
-      if (values.side === 'BUY') {
+      if (side === 'BUY') {
         const requiredAmount = quantity * orderPrice;
         console.log('买入所需USDT:', requiredAmount, '可用余额:', balance);
         if (requiredAmount > balance) {
@@ -128,16 +91,16 @@ const TradeForm: React.FC<TradeFormProps> = ({
       const orderParams: NewOrderParams = {
         symbol: selectedToken,
         side: orderSide,
-        type: values.orderType === 'LIMIT' ? OrderType.LIMIT : OrderType.MARKET,
-        quantity: values.quantity
+        type: orderType === 'LIMIT' ? OrderType.LIMIT : OrderType.MARKET,
+        quantity: quantity.toString()
       };
       
       // 重要：记录最终发送到API的订单参数
       console.log('最终发送到API的订单参数:', JSON.stringify(orderParams));
 
       // 4. 添加限价单特有的参数
-      if (values.orderType === 'LIMIT') {
-        orderParams.price = values.price;
+      if (orderType === 'LIMIT') {
+        orderParams.price = price.toString();
         orderParams.timeInForce = TimeInForce.GTC;
         console.log('限价单参数已添加');
       }
@@ -157,8 +120,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
       }
       
       // 8. 重置表单
-      form.resetFields();
-      setQuantityPercentage(0);
+      
       console.log('表单已重置');
       
     } catch (error: any) {
@@ -174,12 +136,10 @@ const TradeForm: React.FC<TradeFormProps> = ({
 
   // 重置表单
   useEffect(() => {
-    form.resetFields();
-    setQuantityPercentage(0);
+    setOrderType('MARKET');
   }, [selectedToken, form]);
 
   const coinSymbol = selectedToken.split('USDT')[0];
-  const side = form.getFieldValue('side') || 'BUY';
 
   return (
     <>
@@ -188,13 +148,13 @@ const TradeForm: React.FC<TradeFormProps> = ({
         <div className="trade-tabs">
           <div
             className={`trade-tab trade-tab-buy ${side === 'BUY' ? 'active' : ''}`}
-            onClick={() => handleSideChange('BUY')}
+            onClick={() => setSide('BUY')}
           >
             {t('tradeForm.buy')}
           </div>
           <div
             className={`trade-tab trade-tab-sell ${side === 'SELL' ? 'active' : ''}`}
-            onClick={() => handleSideChange('SELL')}
+            onClick={() => setSide('SELL')}
           >
             {t('tradeForm.sell')}
           </div>
@@ -235,12 +195,70 @@ const TradeForm: React.FC<TradeFormProps> = ({
       
       <Form
         form={form}
-        layout="vertical"
+        layout="horizontal"
         initialValues={{
           orderType: 'MARKET'
           // 移除side的初始化，避免可能的冲突
         }}
       >
+        {/* 订单类型选择 */}
+        <Form.Item label={t('tradeForm.orderType')} name="orderType" rules={[{ required: true }]}>
+          <Radio.Group 
+            value={orderType} 
+            onChange={(e) => setOrderType(e.target.value)}
+            className="order-type-group"
+          >
+            <Radio.Button value="MARKET" className="order-type-button">
+              {t('tradeForm.marketOrder')}
+            </Radio.Button>
+            <Radio.Button value="LIMIT" className="order-type-button">
+              {t('tradeForm.limitOrder')}
+            </Radio.Button>
+          </Radio.Group>
+        </Form.Item>
+
+        {/* 价格输入 - 仅限价单显示 */}
+        {orderType === 'LIMIT' && (
+          <Form.Item 
+            label={t('tradeForm.price')} 
+            name="price" 
+            rules={[
+              { 
+                validator: (_, value) => {
+                  // 检查空值
+                  if (value === undefined || value === null || value === '' || value === ' ') {
+                    return Promise.reject(new Error(t('tradeForm.priceRequired')));
+                  }
+                  // 检查是否为有效数字
+                  const numValue = Number(value);
+                  if (isNaN(numValue) || numValue <= 0) {
+                    return Promise.reject(new Error(t('tradeForm.priceInvalid')));
+                  }
+                  return Promise.resolve();
+                }
+              }
+            ]}
+          >
+            <Input
+              placeholder={t('tradeForm.enterPrice')}
+              type="number"
+              min="0.00000001"
+              step="any"
+              className="border-radius-4 height-44 font-size-16"
+              suffix="USDT"
+              value={price}
+              onChange={(e) => setPrice(parseFloat(e.target.value))}
+            />
+            {currentPrice > 0 && (
+              <div className="price-hint">
+                <Text className="text-secondary font-size-12">
+                  {t('tradeForm.currentPrice')}: {currentPrice.toFixed(2)} USDT
+                </Text>
+              </div>
+            )}
+          </Form.Item>
+        )}
+
         {/* 数量输入 */}
         <Form.Item label={t('tradeForm.quantity')} name="quantity" rules={[{ required: true }]}>
           <div>
@@ -252,8 +270,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
               className="border-radius-4 height-44 font-size-16"
               value={quantity}
               onChange={(e) => {
-                form.setFieldValue('quantity', e.target.value);
-                handleQuantityChange(e.target.value);
+                setQuantity(parseFloat(e.target.value));
               }}
             />
             
@@ -263,7 +280,9 @@ const TradeForm: React.FC<TradeFormProps> = ({
                 <Button 
                   key={percent}
                   size="small" 
-                  onClick={() => quickSelectQuantity(percent)}
+                  onClick={() => {
+                    
+                  }}
                   className={`quick-button ${quantityPercentage === percent ? 'active' : ''}`}
                   disabled={loading}
                 >
@@ -280,8 +299,8 @@ const TradeForm: React.FC<TradeFormProps> = ({
             {form.getFieldValue('quantity') && (
               <div className="trade-info-highlight">
                 {side === 'BUY' ? 
-                  `${t('tradeForm.investment')} $${calculateInvestment().toFixed(2)} (${quantityPercentage}% ${t('tradeForm.availableBalance')})` : 
-                  t('tradeForm.sellCanGet', { quantity: form.getFieldValue('quantity'), coin: coinSymbol })+`: $${calculateInvestment().toFixed(2)}`
+                  `${t('tradeForm.investment')} $${calculateInvestment} (${quantityPercentage}% ${t('tradeForm.availableBalance')})` : 
+                  t('tradeForm.sellCanGet', { quantity: form.getFieldValue('quantity'), coin: coinSymbol })+`: $${calculateInvestment}`
                 }
               </div>
             )}
@@ -295,7 +314,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
               {side === 'BUY' ? t('tradeForm.expectedTotal') : t('tradeForm.expectedGet')}
             </Text>
             <Text className="text-primary text-bold">
-              {calculateInvestment().toFixed(2)} USDT
+              {calculateInvestment} USDT
             </Text>
           </div>
           <div className="order-summary-row">
@@ -313,14 +332,8 @@ const TradeForm: React.FC<TradeFormProps> = ({
             loading={loading}
             onClick={() => {
               console.log("按钮点击时，当前显示的交易方向:", side);
+              handleSubmit()
               
-              form.validateFields().then(values => {
-                console.log('表单验证通过，values:', values);
-                // 直接调用handleSubmit，不再传递可能有问题的values.side
-                handleSubmit(values);
-              }).catch(info => {
-                console.log('表单验证失败:', info);
-              });
             }}
             className={`submit-button ${side === 'BUY' ? 'submit-button-buy' : 'submit-button-sell'}`}
           >
