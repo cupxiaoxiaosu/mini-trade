@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Form, Input, Button, message, Typography, Radio } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { createOrder, OrderSide, OrderType, TimeInForce, type NewOrderParams } from '@/adaptor/biance';
+import { useInvestmentCalculation } from '../hooks/useWorker';
 import './styles/trade.css';
 import './styles/common.css';
 
@@ -31,23 +32,32 @@ const TradeForm: React.FC<TradeFormProps> = ({
   const [orderType, setOrderType] = useState<'MARKET' | 'LIMIT'>('MARKET');
   const [price, setPrice] = useState(0);
   const [side, setSide] = useState<'BUY' | 'SELL'>('BUY');
+  
+  // 使用 Web Worker 进行投资计算
+  const { data: investmentData, loading: investmentLoading, calculateInvestment: calculateInvestmentWorker } = useInvestmentCalculation();
   // 使用 useMemo 缓存 quantity 计算，避免重复渲染
   const quantityPercentage = useMemo(() => {
     return side === 'BUY' ? (balance * quantity / 100) / currentPrice : (coinBalance * quantity / 100);
   }, [side, quantity, balance, currentPrice, coinBalance]);
 
+  // 当数量、价格或交易方向变化时，重新计算投资
+  useEffect(() => {
+    if (quantity > 0) {
+      const orderPrice = orderType === 'LIMIT' ? price : currentPrice;
+      if (orderPrice > 0) {
+        calculateInvestmentWorker({
+          quantity,
+          price: orderPrice,
+          side,
+          balance,
+          coinBalance
+        });
+      }
+    }
+  }, [quantity, price, orderType, currentPrice, side, balance, coinBalance, calculateInvestmentWorker]);
+
   
   console.log('quantityPercentage', balance, coinBalance,balance * quantity / 100 , currentPrice);
-
-  // 计算投入金额
-
-  
-  const calculateInvestment = useMemo(() => {
-    const v = (orderType === 'LIMIT' ? price : currentPrice) * quantity;
-    return v.toFixed(2);
-  }, [orderType, price, currentPrice, quantity]);
-
-  
 
   // 提交订单
   const handleSubmit = async () => {
@@ -298,10 +308,23 @@ const TradeForm: React.FC<TradeFormProps> = ({
             
             {form.getFieldValue('quantity') && (
               <div className="trade-info-highlight">
-                {side === 'BUY' ? 
-                  `${t('tradeForm.investment')} $${calculateInvestment} (${quantityPercentage}% ${t('tradeForm.availableBalance')})` : 
-                  t('tradeForm.sellCanGet', { quantity: form.getFieldValue('quantity'), coin: coinSymbol })+`: $${calculateInvestment}`
-                }
+                {investmentLoading ? (
+                  <div className="text-secondary">{t('common.loading')}</div>
+                ) : investmentData ? (
+                  <>
+                    {side === 'BUY' ? 
+                      `${t('tradeForm.investment')} $${investmentData.investment.toFixed(2)} (${quantityPercentage}% ${t('tradeForm.availableBalance')})` : 
+                      t('tradeForm.sellCanGet', { quantity: form.getFieldValue('quantity'), coin: coinSymbol })+`: $${investmentData.investment.toFixed(2)}`
+                    }
+                    {!investmentData.canAfford && (
+                      <div className="text-danger margin-top-4">
+                        {side === 'BUY' ? t('tradeForm.insufficientUSDT') : t('tradeForm.insufficientCoin', { coin: coinSymbol })}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="text-secondary">{t('common.noData')}</div>
+                )}
               </div>
             )}
           </div>
@@ -314,7 +337,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
               {side === 'BUY' ? t('tradeForm.expectedTotal') : t('tradeForm.expectedGet')}
             </Text>
             <Text className="text-primary text-bold">
-              {calculateInvestment} USDT
+              {investmentData ? `${investmentData.investment.toFixed(2)} USDT` : '-- USDT'}
             </Text>
           </div>
           <div className="order-summary-row">

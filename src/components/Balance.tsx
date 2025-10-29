@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Statistic, Row, Col, Spin, Alert } from 'antd';
 import type { Balance } from '../adaptor/biance';
-import { binanceApi, getHistoricalOrders } from '../adaptor/biance';
+import { binanceApi } from '../adaptor/biance';
 import { useTranslation } from 'react-i18next';
+import { usePnLCalculation } from '../hooks/useWorker';
 import './styles/card.css';
 import './styles/common.css';
 
@@ -11,8 +12,9 @@ const Balance: React.FC = () => {
   const [balances, setBalances] = useState<Balance[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [profitLoss, setProfitLoss] = useState<{amount: number; percent: number}>({amount: 0, percent: 0});
-  const [plLoading, setPlLoading] = useState<boolean>(false);
+  
+  // 使用 Web Worker 进行 PnL 计算
+  const { data: pnlData, loading: pnlLoading, error: pnlError, calculatePnL } = usePnLCalculation();
 
   const fetchBalances = async () => {
     try {
@@ -38,46 +40,21 @@ const Balance: React.FC = () => {
 
   const calculateProfitLoss = async () => {
     try {
-      setPlLoading(true);
-      // 模拟数据 - 实际应该通过API获取历史交易数据并计算
-      // 这里我们假设获取BTCUSDT和ETHUSDT的交易历史
-      const btcOrders = await getHistoricalOrders('BTCUSDT', { limit: 100 });
-      const ethOrders = await getHistoricalOrders('ETHUSDT', { limit: 100 });
+      // 获取当前价格数据（这里使用模拟数据，实际应该从 WebSocket 或 API 获取）
+      const mockPrices: Record<string, number> = {
+        'BTC': 45000,
+        'ETH': 3000,
+        'SOL': 100,
+        'USDT': 1
+      };
       
-      // 计算盈亏逻辑
-      // 注意：实际应用中，需要根据开仓和平仓的交易对来准确计算盈亏
-      // 这里使用简化的逻辑，仅供演示
-      let totalBuy = 0;
-      let totalSell = 0;
-      
-      [...btcOrders, ...ethOrders].forEach(order => {
-        if (order.status === 'FILLED') {
-          const executedQty = parseFloat(order.executedQty);
-          const price = parseFloat(order.price);
-          const value = executedQty * price;
-          
-          if (order.side === 'BUY') {
-            totalBuy += value;
-          } else if (order.side === 'SELL') {
-            totalSell += value;
-          }
-        }
-      });
-      
-      // 计算总盈亏和盈亏百分比
-      const profitLossAmount = totalSell - totalBuy;
-      const profitLossPercent = totalBuy > 0 ? (profitLossAmount / totalBuy) * 100 : 0;
-      
-      setProfitLoss({
-        amount: profitLossAmount,
-        percent: profitLossPercent
+      // 使用 Web Worker 计算 PnL
+      calculatePnL({
+        balances,
+        currentPrices: mockPrices
       });
     } catch (err) {
       console.error('计算盈亏失败:', err);
-      // 如果获取交易历史失败，使用模拟数据
-      setProfitLoss({ amount: 1234.56, percent: 8.75 });
-    } finally {
-      setPlLoading(false);
     }
   };
 
@@ -159,27 +136,31 @@ const Balance: React.FC = () => {
             </Col>
             <Col xs={24} md={12}>
               <Card className="statistic-card" variant="outlined">
-                {plLoading ? (
+                {pnlLoading ? (
                   <div className="flex-center height-200">
                     <Spin size="small" />
                     <span className="margin-left-10">{t('balance.calculating')}</span>
                   </div>
-                ) : (
+                ) : pnlError ? (
+                  <div className="text-danger">{pnlError}</div>
+                ) : pnlData ? (
                   <>
                     <Statistic
-                      value={profitLoss.amount}
+                      value={pnlData.totalPnL}
                       precision={2}
-                      valueStyle={{ color: profitLoss.amount >= 0 ? '#52c41a' : '#f5222d' }}
-                      prefix={profitLoss.amount >= 0 ? '+' : ''}
+                      valueStyle={{ color: pnlData.totalPnL >= 0 ? '#52c41a' : '#f5222d' }}
+                      prefix={pnlData.totalPnL >= 0 ? '+' : ''}
                       suffix="USDT"
                       title={t('balance.totalProfitLoss')}
                     />
                     <div className="margin-top-8 font-size-14">
-                      {t('balance.profitLossRate')} <span className={profitLoss.percent >= 0 ? 'text-success' : 'text-danger'}>
-                        {profitLoss.percent >= 0 ? '+' : ''}{profitLoss.percent.toFixed(2)}%
+                      {t('balance.profitLossRate')} <span className={pnlData.pnLRate >= 0 ? 'text-success' : 'text-danger'}>
+                        {pnlData.pnLRate >= 0 ? '+' : ''}{pnlData.pnLRate.toFixed(2)}%
                       </span>
                     </div>
                   </>
+                ) : (
+                  <div className="text-secondary">{t('balance.noData')}</div>
                 )}
               </Card>
             </Col>
