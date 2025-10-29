@@ -34,9 +34,19 @@ const TradeForm: React.FC<TradeFormProps> = ({
   
   // 使用 Web Worker 进行投资计算
   const { data: investmentData, loading: investmentLoading, calculateInvestment: calculateInvestmentWorker } = useInvestmentCalculation();
-  // 使用 useMemo 缓存 quantity 计算，避免重复渲染
+  // 使用 useMemo 缓存 quantityPercentage 计算，避免重复渲染
+  // quantityPercentage 表示当前数量占可用余额的百分比（0-100）
   const quantityPercentage = useMemo(() => {
-    return side === 'BUY' ? (balance * quantity / 100) / currentPrice : (coinBalance * quantity / 100);
+    if (quantity <= 0) return 0;
+    if (side === 'BUY') {
+      if (currentPrice > 0 && balance > 0) {
+        const maxBuyable = balance / currentPrice;
+        return maxBuyable > 0 ? Math.round((quantity / maxBuyable) * 100) : 0;
+      }
+      return 0;
+    } else {
+      return coinBalance > 0 ? Math.round((quantity / coinBalance) * 100) : 0;
+    }
   }, [side, quantity, balance, currentPrice, coinBalance]);
 
   // 当数量、价格或交易方向变化时，重新计算投资
@@ -251,7 +261,14 @@ const TradeForm: React.FC<TradeFormProps> = ({
                   key={percent}
                   size="small" 
                   onClick={() => {
-                    
+                    if (side === 'BUY' && currentPrice > 0) {
+                      // 买入：计算可用余额可以买入的数量，然后按百分比
+                      const maxBuyable = balance / currentPrice;
+                      setQuantity(parseFloat((maxBuyable * (percent / 100)).toFixed(4)));
+                    } else if (side === 'SELL') {
+                      // 卖出：按币种余额的百分比
+                      setQuantity(parseFloat((coinBalance * (percent / 100)).toFixed(4)));
+                    }
                   }}
                   className={`quick-button ${quantityPercentage === percent ? 'active' : ''}`}
                   disabled={loading}
@@ -262,27 +279,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
             </div>
             
        
-            {quantity > 0 && (
-              <div className="trade-info-highlight">
-                {investmentLoading ? (
-                  <div className="text-secondary">{t('common.loading')}</div>
-                ) : investmentData ? (
-                  <>
-                    {side === 'BUY' ? 
-                      `${t('tradeForm.investment')} $${investmentData.investment.toFixed(2)} (${quantityPercentage}% ${t('tradeForm.availableBalance')})` : 
-                      t('tradeForm.sellCanGet', { quantity: quantity, coin: coinSymbol })+`: $${investmentData.investment.toFixed(2)}`
-                    }
-                    {!investmentData.canAfford && (
-                      <div className="text-danger margin-top-4">
-                        {side === 'BUY' ? t('tradeForm.insufficientUSDT') : t('tradeForm.insufficientCoin', { coin: coinSymbol })}
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <div className="text-secondary">{t('common.noData')}</div>
-                )}
-              </div>
-            )}
+        
           </div>
         </div>
 
