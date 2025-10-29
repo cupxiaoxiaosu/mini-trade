@@ -84,28 +84,12 @@ const Main: React.FC = () => {
           </div>
         )}
 
-        <div className="home-grid">
-          <Card title={t('main.marketData')} className="exchange-card grid-row-1-left" variant="outlined">
-            <BookTicker data={bookTicker[selectedToken]} token={selectedToken} />
-          </Card>
-          <Card 
-            title={`${selectedToken} ${t('main.balance')}`} 
-            className="exchange-card grid-row-1-right" 
-            variant="outlined"
-          >
-            <div className="balance-display">
-              <span className="balance-symbol">{coinSymbol}</span>
-              <span className="balance-value">{selectedCoinBalance.toFixed(6)}</span>
-            </div>
-            <Divider className="balance-divider" />
-            <div className="balance-display">
-              <span className="balance-symbol">USDT</span>
-              <span className="balance-value">{usdtBalance.toFixed(2)}</span>
-            </div>
-          </Card>
-
-          {/* 第二行左侧列：K线 + 订单簿 */}
-          <div className="grid-row-2-left">
+        <div className="home-flex-container">
+          {/* 左列：行情数据、K线、订单簿 */}
+          <div className="home-flex-column home-flex-left">
+            <Card title={t('main.marketData')} className="exchange-card" variant="outlined">
+              <BookTicker data={bookTicker[selectedToken]} token={selectedToken} />
+            </Card>
             <Card title={t('main.klineChart')} className="exchange-card" variant="outlined">
               <Kline token={selectedToken} />
             </Card>
@@ -114,7 +98,23 @@ const Main: React.FC = () => {
             </Card>
           </div>
 
-          <div className="grid-row-2-right">
+          {/* 右列：余额、交易表单、历史订单 */}
+          <div className="home-flex-column home-flex-right">
+            <Card 
+              title={`${selectedToken} ${t('main.balance')}`} 
+              className="exchange-card" 
+              variant="outlined"
+            >
+              <div className="balance-display">
+                <span className="balance-symbol">{coinSymbol}</span>
+                <span className="balance-value">{selectedCoinBalance.toFixed(6)}</span>
+              </div>
+              <Divider className="balance-divider" />
+              <div className="balance-display">
+                <span className="balance-symbol">USDT</span>
+                <span className="balance-value">{usdtBalance.toFixed(2)}</span>
+              </div>
+            </Card>
             <Card 
               title={t('main.trade')} 
               className="exchange-card" 
@@ -157,7 +157,6 @@ const Main: React.FC = () => {
                 />
               </div>
             </Card>
-
             <Card 
               title={t('main.currentOrders')} 
               className="exchange-card" 

@@ -198,6 +198,19 @@
 
 /* 主题相关 - 通过 CSS 变量自动处理 */
 
+/* K线图容器手机端优化 */
+@media (max-width: 768px) {
+  .kline-container {
+    height: 240px;
+  }
+}
+
+@media (max-width: 480px) {
+  .kline-container {
+    height: 200px;
+  }
+}
+
 /* 响应式相关 */
 @media (max-width: 768px) {
   .mobile-hidden {

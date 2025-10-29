@@ -21,13 +21,32 @@
   color: var(--color-danger);
 }
 
-/* 主页网格 */
-.home-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+/* 主页 Flex 布局容器 */
+.home-flex-container {
+  display: flex;
+  flex-direction: row;
   gap: 16px;
   max-width: 1400px;
   margin: 0 auto;
+  width: 100%;
+  align-items: flex-start;
+}
+
+/* Flex 列 */
+.home-flex-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+  min-width: 0;
+}
+
+.home-flex-left {
+  /* 左列 */
+}
+
+.home-flex-right {
+  /* 右列 */
 }
 
 /* 交易所卡片 */
@@ -36,6 +55,18 @@
   border: 1px solid var(--border-color);
   border-radius: 8px;
   box-shadow: var(--shadow-sm);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+/* 确保卡片内部元素不会撑开 */
+.exchange-card .ant-card-body {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
 /* 最新价格显示 */
@@ -82,8 +113,13 @@
 
 /* 响应式布局 */
 @media (max-width: 1200px) {
-  .home-grid {
-    grid-template-columns: 1fr;
+  .home-flex-container {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .home-flex-column {
+    width: 100%;
   }
   
   .exchange-content {
@@ -93,10 +129,110 @@
 
 @media (max-width: 768px) {
   .exchange-content {
-    padding: 12px;
+    padding: 8px;
   }
   
-  .home-grid {
-    gap: 12px;
+  .home-flex-container {
+    flex-direction: column;
+    gap: 8px;
+    max-width: 100%;
+    width: 100%;
+  }
+  
+  .home-flex-column {
+    width: 100%;
+    gap: 8px;
+  }
+  
+  /* 卡片在手机端更紧凑 */
+  .exchange-card {
+    border-radius: 6px;
+  }
+  
+  /* 余额显示在手机端优化 */
+  .balance-display {
+    font-size: 13px;
+    padding: 4px 0;
+  }
+  
+  .balance-value {
+    font-size: 15px;
+  }
+  
+  .balance-divider {
+    margin: 8px 0;
+  }
+  
+  /* 最新价格在手机端优化 */
+  .latest-price-container {
+    text-align: center;
+  }
+  
+  .latest-price-label {
+    font-size: 11px;
+  }
+  
+  .latest-price-value {
+    font-size: 14px;
+  }
+  
+  /* 错误消息在手机端优化 */
+  .error-message {
+    padding: 10px 12px;
+    font-size: 13px;
+    margin-bottom: 12px;
+  }
+  
+  /* 交易表单容器在手机端 */
+  .trade-form-container {
+    padding-top: 2px;
+  }
+  
+  /* card-extra 区域在手机端优化 */
+  .card-extra {
+    flex-wrap: wrap;
+    gap: 8px !important;
+  }
+  
+  .card-extra span {
+    font-size: 11px;
+  }
+  
+  .card-extra .ant-btn {
+    font-size: 11px;
+    padding: 2px 8px;
+    height: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .exchange-content {
+    padding: 6px;
+  }
+  
+  .home-flex-container {
+    gap: 6px;
+    width: 100%;
+  }
+  
+  .home-flex-column {
+    gap: 6px;
+  }
+  
+  .balance-display {
+    font-size: 12px;
+  }
+  
+  .balance-value {
+    font-size: 14px;
+  }
+  
+  .latest-price-value {
+    font-size: 13px;
+  }
+  
+  .error-message {
+    padding: 8px 10px;
+    font-size: 12px;
   }
 }

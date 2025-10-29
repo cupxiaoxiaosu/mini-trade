@@ -121,8 +121,8 @@ const Balance: React.FC = () => {
       
       {!loading && !error && (
         <>
-          <Row gutter={[16, 16]}>
-            <Col xs={24} md={12}>
+          <Row gutter={[12, 12]} className="balance-statistics-row">
+            <Col xs={24} sm={24} md={12}>
               <Card className="statistic-card" variant="outlined">
                 <Statistic
                   value={getTotalBalance()}
@@ -134,7 +134,7 @@ const Balance: React.FC = () => {
                 />
               </Card>
             </Col>
-            <Col xs={24} md={12}>
+            <Col xs={24} sm={24} md={12}>
               <Card className="statistic-card" variant="outlined">
                 {pnlLoading ? (
                   <div className="flex-center height-200">
@@ -166,7 +166,7 @@ const Balance: React.FC = () => {
             </Col>
           </Row>
           
-          <Row gutter={[16, 16]}>
+          <Row gutter={[12, 12]} className="balance-cards-row">
             {balances.map((balance) => {
               const total = parseFloat(balance.free) + parseFloat(balance.locked);
               return (

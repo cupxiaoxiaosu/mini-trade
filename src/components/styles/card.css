@@ -32,26 +32,81 @@
 .grid-row-1-left {
   grid-column: 1;
   grid-row: 1;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .grid-row-1-right {
   grid-column: 2;
   grid-row: 1;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .grid-row-2-left {
   grid-column: 1;
   grid-row: 2;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.grid-row-2-left .exchange-card {
+  width: 100%;
+  max-width: 100%;
 }
 
 .grid-row-2-right {
   grid-column: 2;
   grid-row: 2;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.grid-row-2-right .exchange-card {
+  width: 100%;
+  max-width: 100%;
 }
 
 /* 统计卡片 */
 .statistic-card {
   margin-bottom: 20px;
+}
+
+/* 统计卡片手机端优化 */
+@media (max-width: 768px) {
+  .statistic-card {
+    margin-bottom: 12px;
+  }
+  
+  .statistic-card .ant-statistic-title {
+    font-size: 13px;
+  }
+  
+  .statistic-card .ant-statistic-content {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .statistic-card {
+    margin-bottom: 10px;
+  }
+  
+  .statistic-card .ant-statistic-title {
+    font-size: 12px;
+  }
+  
+  .statistic-card .ant-statistic-content {
+    font-size: 18px;
+  }
 }
 
 .statistic-value {
@@ -83,6 +138,56 @@
   transition: all 0.3s ease;
 }
 
+/* 余额卡片手机端优化 */
+@media (max-width: 768px) {
+  /* Row gutter 在手机端更小 */
+  .balance-statistics-row.ant-row,
+  .balance-cards-row.ant-row {
+    margin-left: -6px !important;
+    margin-right: -6px !important;
+  }
+  
+  .balance-statistics-row .ant-col,
+  .balance-cards-row .ant-col {
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+  }
+  
+  .balance-card {
+    margin-bottom: 12px;
+  }
+  
+  .balance-card .ant-statistic-title {
+    font-size: 12px;
+  }
+  
+  .balance-card .ant-statistic-content {
+    font-size: 16px;
+  }
+  
+  .balance-card .ant-statistic-content-value {
+    font-size: 16px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .balance-card {
+    margin-bottom: 10px;
+  }
+  
+  .balance-card .ant-statistic-title {
+    font-size: 11px;
+  }
+  
+  .balance-card .ant-statistic-content {
+    font-size: 14px;
+  }
+  
+  .balance-card .ant-statistic-content-value {
+    font-size: 14px !important;
+  }
+}
+
 /* 响应式布局 */
 @media (max-width: 1200px) {
   .grid-container {
@@ -94,6 +199,8 @@
   .grid-row-2-left,
   .grid-row-2-right {
     grid-column: 1;
+    width: 100%;
+    max-width: 100%;
   }
   
   .grid-row-2-left {
@@ -102,5 +209,147 @@
   
   .grid-row-2-right {
     grid-row: 3;
+  }
+  
+  /* 确保容器内的卡片都是全宽 */
+  .grid-row-2-left .exchange-card,
+  .grid-row-2-right .exchange-card {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  /* 卡片标题在手机端 */
+  .card-title {
+    font-size: 14px;
+    margin-bottom: 12px;
+  }
+  
+  /* 卡片内容在手机端 */
+  .card-content {
+    padding: 12px;
+  }
+  
+  /* 卡片容器在手机端 */
+  .card-container {
+    margin-bottom: 12px;
+  }
+  
+  /* 统计卡片在手机端 */
+  .statistic-card {
+    margin-bottom: 12px;
+  }
+  
+  .statistic-value {
+    font-size: 20px;
+  }
+  
+  /* grid-row-2-left 在手机端的间距 */
+  .grid-row-2-left {
+    gap: 8px;
+    width: 100% !important;
+    max-width: 100% !important;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* grid-row-2-right 在手机端的间距 */
+  .grid-row-2-right {
+    gap: 8px;
+    width: 100% !important;
+    max-width: 100% !important;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* 确保容器内的卡片都是全宽 */
+  .grid-row-2-left .exchange-card,
+  .grid-row-2-right .exchange-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    flex-shrink: 1;
+  }
+  
+  /* card-extra 在手机端优化 */
+  .card-extra {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 480px) {
+  .card-title {
+    font-size: 13px;
+    margin-bottom: 10px;
+  }
+  
+  .card-content {
+    padding: 10px;
+  }
+  
+  .card-container {
+    margin-bottom: 10px;
+  }
+  
+  .statistic-value {
+    font-size: 18px;
+  }
+  
+  .grid-row-2-left,
+  .grid-row-2-right {
+    gap: 6px;
+  }
+  
+  .card-extra {
+    font-size: 10px;
+  }
+}
+
+/* Ant Design Card 组件手机端优化 */
+@media (max-width: 768px) {
+  .exchange-card .ant-card-head {
+    padding: 0 12px;
+    min-height: 40px;
+  }
+  
+  .exchange-card .ant-card-head-title {
+    font-size: 14px;
+    padding: 8px 0;
+  }
+  
+  .exchange-card .ant-card-extra {
+    padding: 8px 0;
+    font-size: 11px;
+  }
+  
+  .exchange-card .ant-card-body {
+    padding: 12px;
+  }
+  
+  /* 余额卡片在手机端 */
+  .exchange-card .balance-display {
+    padding: 6px 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .exchange-card .ant-card-head {
+    padding: 0 10px;
+    min-height: 36px;
+  }
+  
+  .exchange-card .ant-card-head-title {
+    font-size: 13px;
+    padding: 6px 0;
+  }
+  
+  .exchange-card .ant-card-extra {
+    padding: 6px 0;
+    font-size: 10px;
+  }
+  
+  .exchange-card .ant-card-body {
+    padding: 10px;
   }
 }
