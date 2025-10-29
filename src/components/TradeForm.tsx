@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Form, Input, Button, message, Typography, Radio } from 'antd';
+import { Input, Button, message, Typography, Radio } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { createOrder, OrderSide, OrderType, TimeInForce, type NewOrderParams } from '@/adaptor/biance';
 import { useInvestmentCalculation } from '../hooks/useWorker';
@@ -26,7 +26,6 @@ const TradeForm: React.FC<TradeFormProps> = ({
   currentPrice = 0
 }) => {
   const { t } = useTranslation();
-  const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [quantity, setQuantity] = useState(0);
   const [orderType, setOrderType] = useState<'MARKET' | 'LIMIT'>('MARKET');
@@ -147,7 +146,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
   // 重置表单
   useEffect(() => {
     setOrderType('MARKET');
-  }, [selectedToken, form]);
+  }, [selectedToken]);
 
   const coinSymbol = selectedToken.split('USDT')[0];
 
@@ -173,17 +172,10 @@ const TradeForm: React.FC<TradeFormProps> = ({
         {/* 余额显示 */}
       </div>
       
-      <Form
-        style={{ marginTop: '16px' }}
-        form={form}
-        layout="horizontal"
-        initialValues={{
-          orderType: 'MARKET'
-          // 移除side的初始化，避免可能的冲突
-        }}
-      >
+      <div style={{ marginTop: '16px' }}>
         {/* 订单类型选择 */}
-        <Form.Item  name="orderType" rules={[{ required: true }]}>
+        <div style={{ marginBottom: '20px' }}>
+        
           <Radio.Group 
             value={orderType} 
             onChange={(e) => setOrderType(e.target.value)}
@@ -196,30 +188,14 @@ const TradeForm: React.FC<TradeFormProps> = ({
               {t('tradeForm.limitOrder')}
             </Radio.Button>
           </Radio.Group>
-        </Form.Item>
+        </div>
 
         {/* 价格输入 - 仅限价单显示 */}
         {orderType === 'LIMIT' && (
-          <Form.Item 
-            label={t('tradeForm.price')} 
-            name="price" 
-            rules={[
-              { 
-                validator: (_, value) => {
-                  // 检查空值
-                  if (value === undefined || value === null || value === '' || value === ' ') {
-                    return Promise.reject(new Error(t('tradeForm.priceRequired')));
-                  }
-                  // 检查是否为有效数字
-                  const numValue = Number(value);
-                  if (isNaN(numValue) || numValue <= 0) {
-                    return Promise.reject(new Error(t('tradeForm.priceInvalid')));
-                  }
-                  return Promise.resolve();
-                }
-              }
-            ]}
-          >
+          <div style={{ marginBottom: '20px' }}>
+            <div style={{ marginBottom: '8px', fontSize: '14px', color: 'var(--text-secondary)' }}>
+              {t('tradeForm.price')}
+            </div>
             <Input
               placeholder={t('tradeForm.enterPrice')}
               type="number"
@@ -228,7 +204,14 @@ const TradeForm: React.FC<TradeFormProps> = ({
               className="border-radius-4 height-44 font-size-16"
               suffix="USDT"
               value={price}
-              onChange={(e) => setPrice(parseFloat(e.target.value))}
+              onChange={(e) => {
+                const value = parseFloat(e.target.value);
+                if (!isNaN(value) && value > 0) {
+                  setPrice(value);
+                } else if (e.target.value === '') {
+                  setPrice(0);
+                }
+              }}
             />
             {currentPrice > 0 && (
               <div className="price-hint">
@@ -237,11 +220,12 @@ const TradeForm: React.FC<TradeFormProps> = ({
                 </Text>
               </div>
             )}
-          </Form.Item>
+          </div>
         )}
 
         {/* 数量输入 */}
-        <Form.Item  name="quantity" rules={[{ required: true }]}>
+        <div style={{ marginBottom: '20px' }}>
+          
           <div>
             <Input 
               placeholder={t('tradeForm.enterQuantity', { coin: coinSymbol })} 
@@ -251,7 +235,12 @@ const TradeForm: React.FC<TradeFormProps> = ({
               className="border-radius-4 height-44 font-size-16"
               value={quantity}
               onChange={(e) => {
-                setQuantity(parseFloat(e.target.value));
+                const value = parseFloat(e.target.value);
+                if (!isNaN(value)) {
+                  setQuantity(value);
+                } else if (e.target.value === '') {
+                  setQuantity(0);
+                }
               }}
             />
             
@@ -273,7 +262,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
             </div>
             
        
-            {form.getFieldValue('quantity') && (
+            {quantity > 0 && (
               <div className="trade-info-highlight">
                 {investmentLoading ? (
                   <div className="text-secondary">{t('common.loading')}</div>
@@ -281,7 +270,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
                   <>
                     {side === 'BUY' ? 
                       `${t('tradeForm.investment')} $${investmentData.investment.toFixed(2)} (${quantityPercentage}% ${t('tradeForm.availableBalance')})` : 
-                      t('tradeForm.sellCanGet', { quantity: form.getFieldValue('quantity'), coin: coinSymbol })+`: $${investmentData.investment.toFixed(2)}`
+                      t('tradeForm.sellCanGet', { quantity: quantity, coin: coinSymbol })+`: $${investmentData.investment.toFixed(2)}`
                     }
                     {!investmentData.canAfford && (
                       <div className="text-danger margin-top-4">
@@ -295,7 +284,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
               </div>
             )}
           </div>
-        </Form.Item>
+        </div>
 
         {/* 订单摘要 */}
         <div className="order-summary">
@@ -329,7 +318,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
         </div>
         
         {/* 提交按钮 */}
-        <Form.Item>
+        <div style={{ marginTop: '20px' }}>
           <Button 
             type="primary" 
             loading={loading}
@@ -345,8 +334,8 @@ const TradeForm: React.FC<TradeFormProps> = ({
               (side === 'BUY' ? t('tradeForm.buyButton', { coin: coinSymbol }) : t('tradeForm.sellButton', { coin: coinSymbol }))
             }
           </Button>
-        </Form.Item>
-      </Form>
+        </div>
+      </div>
     </>
   );
 };
