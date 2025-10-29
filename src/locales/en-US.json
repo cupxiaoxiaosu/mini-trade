@@ -109,6 +109,20 @@
   "theme": {
     "switchToDark": "Switch to dark mode",
     "switchToLight": "Switch to light mode"
+  },
+  "login": {
+    "title": "Login",
+    "apiKey": "API Key",
+    "apiSecret": "API Secret",
+    "enterApiKey": "Enter API Key",
+    "enterApiSecret": "Enter API Secret",
+    "apiKeyRequired": "Please enter API Key",
+    "apiSecretRequired": "Please enter API Secret",
+    "connect": "Connect",
+    "success": "Connected successfully",
+    "failed": "Connection failed",
+    "invalidCredentials": "Please enter valid API Key and Secret",
+    "tips": "Tips: Please ensure your API Key and Secret are correctly configured and have the necessary trading permissions."
   }
 }
 

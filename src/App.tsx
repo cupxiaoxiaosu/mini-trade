@@ -1,4 +1,5 @@
 import Main from './components/Main';
+import Login from './components/Login';
 import ThemeToggle from './components/ThemeToggle';
 import LanguageSwitcher from './components/LanguageSwitcher';
 import './App.css';
@@ -8,9 +9,19 @@ import { useEffect, useMemo, useState } from 'react';
 import { ConfigProvider, theme as antdTheme } from 'antd';
 import { HashRouter } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { updateApiCredentials } from './adaptor/biance/api';
 
 function AppContent() {
   const { i18n } = useTranslation();
+  
+  // 检查是否已登录
+  const checkAuth = () => {
+    const apiKey = localStorage.getItem('apiKey');
+    const apiSecret = localStorage.getItem('apiSecret');
+    return !!(apiKey && apiSecret);
+  };
+
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(checkAuth);
   
   const getInitialTheme = () => {
     const stored = localStorage.getItem('theme');
@@ -20,6 +31,12 @@ function AppContent() {
   };
 
   const [theme, setTheme] = useState<'light' | 'dark'>(getInitialTheme);
+
+  // 处理登录
+  const handleLogin = (apiKey: string, apiSecret: string) => {
+    updateApiCredentials(apiKey, apiSecret);
+    setIsAuthenticated(true);
+  };
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -52,6 +69,31 @@ function AppContent() {
 
   const toggleTheme = () => setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
 
+  // 如果未认证，显示登录页面
+  if (!isAuthenticated) {
+    return (
+      <ConfigProvider
+        theme={{
+          algorithm: isDark ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm,
+          token: isDark
+            ? {
+                colorPrimary: '#1976d2',
+              }
+            : {
+                colorPrimary: '#1976d2',
+                colorBgBase: '#fafafa',
+                colorBgLayout: '#ffffff',
+                colorBgContainer: '#ffffff',
+                colorBgElevated: '#ffffff',
+              },
+        }}
+      >
+        <Login onLogin={handleLogin} />
+      </ConfigProvider>
+    );
+  }
+
+  // 已认证，显示主页面
   return (
     <ConfigProvider
       theme={{

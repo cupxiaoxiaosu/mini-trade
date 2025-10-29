@@ -109,6 +109,20 @@
   "theme": {
     "switchToDark": "切换为深色模式",
     "switchToLight": "切换为浅色模式"
+  },
+  "login": {
+    "title": "登录",
+    "apiKey": "API Key",
+    "apiSecret": "API Secret",
+    "enterApiKey": "请输入 API Key",
+    "enterApiSecret": "请输入 API Secret",
+    "apiKeyRequired": "请输入 API Key",
+    "apiSecretRequired": "请输入 API Secret",
+    "connect": "连接",
+    "success": "连接成功",
+    "failed": "连接失败",
+    "invalidCredentials": "请输入有效的 API Key 和 Secret",
+    "tips": "提示：请确保您的 API Key 和 Secret 已正确配置，并且具有必要的交易权限。"
   }
 }
 

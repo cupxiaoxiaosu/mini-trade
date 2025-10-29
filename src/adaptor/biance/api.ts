@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
-import { API_KEY, API_SECRET } from './config';
+import { getApiKey, getApiSecret } from './config';
 import querystring from 'querystring';
 import type { 
   RequestParams, 
@@ -39,6 +39,15 @@ class BinanceApiClient {
         'Content-Type': 'application/json'
       }
     });
+  }
+
+  /**
+   * 更新 API Key 和 Secret
+   */
+  updateCredentials(apiKey: string, apiSecret: string) {
+    this.apiKey = apiKey;
+    this.apiSecret = apiSecret;
+    this.axiosInstance.defaults.headers['X-MBX-APIKEY'] = apiKey;
   }
 
   /**
@@ -269,7 +278,12 @@ class BinanceApiClient {
 }
 
 // 创建并导出API客户端实例
-export const binanceApi = new BinanceApiClient(API_KEY, API_SECRET);
+export const binanceApi = new BinanceApiClient(getApiKey(), getApiSecret());
+
+// 导出更新凭证的函数
+export const updateApiCredentials = (apiKey: string, apiSecret: string) => {
+  binanceApi.updateCredentials(apiKey, apiSecret);
+};
 
 // 导出便捷方法
 export const getAccountBalance = binanceApi.getAccountInfo.bind(binanceApi);
