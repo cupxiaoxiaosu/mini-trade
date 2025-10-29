@@ -22,9 +22,7 @@ body {
 
 /* 主题切换按钮 */
 .theme-toggle {
-  position: fixed;
-  top: 12px;
-  right: 12px;
+
   width: 36px;
   height: 36px;
   border-radius: 18px;

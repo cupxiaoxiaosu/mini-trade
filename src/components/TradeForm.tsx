@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Input, Button, message, Typography, Radio } from 'antd';
+import { Input, Button, message, Typography, Radio, App } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { createOrder, OrderSide, OrderType, TimeInForce, type NewOrderParams } from '@/adaptor/biance';
 import { useInvestmentCalculation } from '../hooks/useWorker';
@@ -26,6 +26,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
   currentPrice = 0
 }) => {
   const { t } = useTranslation();
+  const { notification } = App.useApp();
   const [loading, setLoading] = useState(false);
   const [quantity, setQuantity] = useState(0);
   const [orderType, setOrderType] = useState<'MARKET' | 'LIMIT'>('MARKET');
@@ -33,7 +34,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
   const [side, setSide] = useState<'BUY' | 'SELL'>('BUY');
   
   // 使用 Web Worker 进行投资计算
-  const { data: investmentData, loading: investmentLoading, calculateInvestment: calculateInvestmentWorker } = useInvestmentCalculation();
+  const { data: investmentData, calculateInvestment: calculateInvestmentWorker } = useInvestmentCalculation();
   // 使用 useMemo 缓存 quantityPercentage 计算，避免重复渲染
   // quantityPercentage 表示当前数量占可用余额的百分比（0-100）
   const quantityPercentage = useMemo(() => {
@@ -129,8 +130,22 @@ const TradeForm: React.FC<TradeFormProps> = ({
       const orderResult = await createOrder(orderParams);
       console.log('订单创建成功:', orderResult);
       
-      // 6. 处理成功响应
-      message.success(`${t('tradeForm.orderCreated')}! ${t('historicalOrders.orderId')}: ${orderResult?.orderId || 'N/A'}`);
+      // 6. 处理成功响应 - 使用 notification 显示详细信息
+      notification.success({
+        message: t('tradeForm.orderCreated'),
+        description: (
+          <div style={{ lineHeight: '1.8' }}>
+            <div style={{ marginBottom: '4px' }}><strong>{t('historicalOrders.orderId')}:</strong> {orderResult?.orderId || 'N/A'}</div>
+            <div style={{ marginBottom: '4px' }}><strong>{t('historicalOrders.symbol')}:</strong> {selectedToken}</div>
+            <div style={{ marginBottom: '4px' }}><strong>{t('historicalOrders.direction')}:</strong> {side === 'BUY' ? t('orderBook.buy') : t('orderBook.sell')}</div>
+            <div style={{ marginBottom: '4px' }}><strong>{t('historicalOrders.type')}:</strong> {orderType === 'MARKET' ? t('historicalOrders.marketOrder') : t('historicalOrders.limitOrder')}</div>
+            <div style={{ marginBottom: '4px' }}><strong>{t('historicalOrders.price')}:</strong> {orderPrice.toFixed(4)} USDT</div>
+            <div><strong>{t('historicalOrders.quantity')}:</strong> {quantity.toFixed(4)} {coinSymbol}</div>
+          </div>
+        ),
+        duration: 5,
+        placement: 'topRight',
+      });
       
       // 7. 通知父组件订单已创建
       if (onOrderCreated) {
@@ -290,7 +305,20 @@ const TradeForm: React.FC<TradeFormProps> = ({
               {side === 'BUY' ? t('tradeForm.expectedTotal') : t('tradeForm.expectedGet')}
             </Text>
             <Text className="text-primary text-bold">
-              {investmentData ? `${investmentData.investment.toFixed(2)} USDT` : '-- USDT'}
+              {(() => {
+                if (investmentData && investmentData.investment > 0) {
+                  return `${investmentData.investment.toFixed(2)} USDT`;
+                }
+                // 备用计算：如果 investmentData 不可用，直接计算
+                if (quantity > 0) {
+                  const orderPrice = orderType === 'LIMIT' ? price : currentPrice;
+                  if (orderPrice > 0) {
+                    const totalPrice = quantity * orderPrice;
+                    return `${totalPrice.toFixed(2)} USDT`;
+                  }
+                }
+                return '-- USDT';
+              })()}
             </Text>
           </div>
           <div className="order-summary-row">

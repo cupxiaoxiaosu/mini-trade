@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { Layout, Card, Divider } from 'antd';
+import React, { useState, useEffect, useRef } from 'react';
+import { Layout, Card, Divider, Button } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useBinanceWebSocket } from '@/hooks/useBinanceWebSocket';
 import { binanceApi } from '@/adaptor/biance';
 import OrderBook from './OrderBook';
 import { Kline } from './Kline';
 import BookTicker from './BookTicker';
-import HistoricalOrders from './HistoricalOrders';
+import HistoricalOrders, { type HistoricalOrdersRef } from './HistoricalOrders';
 import TradeForm from './TradeForm';
 import ExchangeHeader from './ExchangeHeader';
 import './styles/layout.css';
@@ -23,6 +23,8 @@ const Main: React.FC = () => {
   const [selectedToken, setSelectedToken] = useState<Token>('ETHUSDT');
   const [usdtBalance, setUsdtBalance] = useState<number>(10000);
   const [selectedCoinBalance, setSelectedCoinBalance] = useState<number>(10);
+  const historicalOrdersRef = useRef<HistoricalOrdersRef>(null);
+  const [ordersLoading, setOrdersLoading] = useState<boolean>(false);
   
   // 获取真实余额数据
   const fetchBalances = async () => {
@@ -160,9 +162,29 @@ const Main: React.FC = () => {
               title={t('main.currentOrders')} 
               className="exchange-card" 
               variant="outlined"
-              extra={<div className="card-extra">{t('main.recentRecords')}</div>}
+              bodyStyle={{ padding: 0 }}
+              extra={
+                <div className="card-extra" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <span>{t('main.recentRecords')}</span>
+                  <Button 
+                    type="primary" 
+                    size="small"
+                    loading={ordersLoading}
+                    onClick={() => {
+                      historicalOrdersRef.current?.refresh();
+                    }}
+                  >
+                    {t('common.refresh')}
+                  </Button>
+                </div>
+              }
             >
-              <HistoricalOrders key={`orders-${refreshKey}`} symbol={selectedToken} />
+              <HistoricalOrders 
+                ref={historicalOrdersRef} 
+                key={`orders-${refreshKey}`} 
+                symbol={selectedToken}
+                onLoadingChange={setOrdersLoading}
+              />
             </Card>
           </div>
         </div>

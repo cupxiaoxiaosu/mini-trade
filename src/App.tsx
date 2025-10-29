@@ -6,7 +6,7 @@ import './App.css';
 import './components/styles/common.css';
 import './components/styles/app.css';
 import { useEffect, useMemo, useState } from 'react';
-import { ConfigProvider, theme as antdTheme } from 'antd';
+import { ConfigProvider, App as AntdApp, theme as antdTheme } from 'antd';
 import { HashRouter } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { updateApiCredentials } from './adaptor/biance/api';
@@ -88,7 +88,9 @@ function AppContent() {
               },
         }}
       >
-        <Login onLogin={handleLogin} />
+        <AntdApp>
+          <Login onLogin={handleLogin} />
+        </AntdApp>
       </ConfigProvider>
     );
   }
@@ -125,13 +127,15 @@ function AppContent() {
             },
       }}
     >
-      <div className="app">
-        <div className="app-controls">
-          <LanguageSwitcher onLanguageChange={handleLanguageChange} />
-          <ThemeToggle isDark={isDark} onToggle={toggleTheme} />
+      <AntdApp>
+        <div className="app">
+          <div className="app-controls">
+            <LanguageSwitcher onLanguageChange={handleLanguageChange} />
+            <ThemeToggle isDark={isDark} onToggle={toggleTheme} />
+          </div>
+          <Main />
         </div>
-        <Main />
-      </div>
+      </AntdApp>
     </ConfigProvider>
   );
 }

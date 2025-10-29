@@ -4,9 +4,10 @@
   top: 16px;
   right: 16px;
   display: flex;
+  align-items: center;
   gap: 12px;
   z-index: 1000;
-  width: 112px;
+  width: fit-content;
 }
 
 /* 主题适配 */

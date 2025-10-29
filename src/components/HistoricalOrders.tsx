@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
 import { Table, Spin, Alert, Empty, Button } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useTranslation } from 'react-i18next';
@@ -8,9 +8,15 @@ import './styles/common.css';
 
 type HistoricalOrdersProps = {
   symbol?: 'ETHUSDT' | 'BTCUSDT' | 'SOLUSDT';
+  onLoadingChange?: (loading: boolean) => void;
 };
 
-const HistoricalOrders: React.FC<HistoricalOrdersProps> = ({ symbol }) => {
+export interface HistoricalOrdersRef {
+  refresh: () => void;
+  loading: boolean;
+}
+
+const HistoricalOrders = forwardRef<HistoricalOrdersRef, HistoricalOrdersProps>(({ symbol, onLoadingChange }, ref) => {
   const { t } = useTranslation();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
@@ -20,6 +26,7 @@ const HistoricalOrders: React.FC<HistoricalOrdersProps> = ({ symbol }) => {
   // 获取历史订单数据
   const fetchHistoricalOrders = async () => {
     setLoading(true);
+    onLoadingChange?.(true);
     setError(null);
     
     try {
@@ -43,8 +50,15 @@ const HistoricalOrders: React.FC<HistoricalOrdersProps> = ({ symbol }) => {
       setError(err instanceof Error ? err.message : t('historicalOrders.fetchFailed'));
     } finally {
       setLoading(false);
+      onLoadingChange?.(false);
     }
   };
+
+  // 使用 useImperativeHandle 暴露刷新方法和状态
+  useImperativeHandle(ref, () => ({
+    refresh: fetchHistoricalOrders,
+    loading
+  }), [loading]);
 
   // 组件挂载时获取数据，当组件重新渲染或limit变化时都重新获取
   useEffect(() => {
@@ -128,14 +142,6 @@ const HistoricalOrders: React.FC<HistoricalOrdersProps> = ({ symbol }) => {
 
   return (
     <div className="historical-orders">
-      <div className="table-controls">
-        <div className="table-controls-left">
-          <Button type="primary" onClick={fetchHistoricalOrders} loading={loading}>
-            {t('common.refresh')}
-          </Button>
-        </div>
-      </div>
-      
       {loading && (
         <div className="table-loading">
           <Spin tip={t('common.loading')} />
@@ -176,6 +182,8 @@ const HistoricalOrders: React.FC<HistoricalOrdersProps> = ({ symbol }) => {
       )}
     </div>
   );
-};
+});
+
+HistoricalOrders.displayName = 'HistoricalOrders';
 
 export default HistoricalOrders;
