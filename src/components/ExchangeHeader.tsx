@@ -26,7 +26,7 @@ const ExchangeHeader: React.FC<ExchangeHeaderProps> = ({
       <div className="header-content">
         <div className="header-left">
           <div className="main-controls">
-            <div>Mini Trade</div>
+            <div className="exchange-title">Mini Trade</div>
             <div className="symbol-selector">
               <Select
                 className="symbol-selector-dropdown"

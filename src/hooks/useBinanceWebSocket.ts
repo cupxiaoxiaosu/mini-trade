@@ -18,14 +18,47 @@ interface UseBinanceWebSocketReturn {
 
 
 
-export const useBinanceWebSocket = (): UseBinanceWebSocketReturn => {
-  const wsRef = useRef<WebSocket | null>(null);
+const TRADE_STORAGE_KEY = 'binance_trade_data';
 
-  const [trade, setTrade] = useState<TradeLists>({
+// 从 localStorage 读取交易数据
+const loadTradeFromStorage = (): TradeLists => {
+  try {
+    const stored = localStorage.getItem(TRADE_STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      // 验证数据格式
+      if (parsed && typeof parsed === 'object' && 'ETHUSDT' in parsed && 'BTCUSDT' in parsed && 'SOLUSDT' in parsed) {
+        return {
+          ETHUSDT: Array.isArray(parsed.ETHUSDT) ? parsed.ETHUSDT : [],
+          BTCUSDT: Array.isArray(parsed.BTCUSDT) ? parsed.BTCUSDT : [],
+          SOLUSDT: Array.isArray(parsed.SOLUSDT) ? parsed.SOLUSDT : [],
+        };
+      }
+    }
+  } catch (error) {
+    console.error('读取 localStorage 交易数据失败:', error);
+  }
+  return {
     ETHUSDT: [],
     BTCUSDT: [],
     SOLUSDT: [],
-  });
+  };
+};
+
+// 保存交易数据到 localStorage
+const saveTradeToStorage = (tradeData: TradeLists) => {
+  try {
+    localStorage.setItem(TRADE_STORAGE_KEY, JSON.stringify(tradeData));
+  } catch (error) {
+    console.error('保存交易数据到 localStorage 失败:', error);
+  }
+};
+
+export const useBinanceWebSocket = (): UseBinanceWebSocketReturn => {
+  const wsRef = useRef<WebSocket | null>(null);
+
+  // 初始化时从 localStorage 读取数据
+  const [trade, setTrade] = useState<TradeLists>(() => loadTradeFromStorage());
   
   const [kline, setKline] = useState<KlineLists>({
     ETHUSDT: [],
@@ -59,10 +92,13 @@ export const useBinanceWebSocket = (): UseBinanceWebSocketReturn => {
           if(data.e === 'trade') {
             setTrade(prev => {
               const newList = [...prev[symbol as keyof TradeLists], data];
-              return {
+              const updated = {
                 ...prev,
                 [symbol]: newList.slice(-20)
               };
+              // 保存到 localStorage
+              saveTradeToStorage(updated);
+              return updated;
             });
           }
           else if(data.e === 'kline') {
