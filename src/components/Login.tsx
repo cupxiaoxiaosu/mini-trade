@@ -93,6 +93,17 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
               {t('login.connect')}
             </Button>
           </Form.Item>
+
+          <Form.Item>
+            <Button
+              type="default"
+              className="create-api-button"
+              block
+              onClick={() => window.open('https://testnet.binance.vision/', '_blank')}
+            >
+              {t('login.createNewCredentials')}
+            </Button>
+          </Form.Item>
         </Form>
 
         <div className="login-tips">

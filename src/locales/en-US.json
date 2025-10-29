@@ -119,6 +119,7 @@
     "apiKeyRequired": "Please enter API Key",
     "apiSecretRequired": "Please enter API Secret",
     "connect": "Connect",
+    "createNewCredentials": "Create New API Credentials",
     "success": "Connected successfully",
     "failed": "Connection failed",
     "invalidCredentials": "Please enter valid API Key and Secret",

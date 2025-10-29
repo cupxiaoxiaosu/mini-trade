@@ -119,6 +119,7 @@
     "apiKeyRequired": "请输入 API Key",
     "apiSecretRequired": "请输入 API Secret",
     "connect": "连接",
+    "createNewCredentials": "创建新的 API 凭证",
     "success": "连接成功",
     "failed": "连接失败",
     "invalidCredentials": "请输入有效的 API Key 和 Secret",

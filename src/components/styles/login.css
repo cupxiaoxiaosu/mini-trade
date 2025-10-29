@@ -39,6 +39,23 @@
   margin-top: 8px;
 }
 
+.create-api-button {
+  height: 44px;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 500;
+  margin-top: 8px;
+  background-color: var(--bg-tertiary);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+.create-api-button:hover {
+  background-color: var(--bg-hover);
+  border-color: var(--border-color-hover);
+  color: var(--text-primary);
+}
+
 .login-tips {
   margin-top: 20px;
   padding: 16px;
