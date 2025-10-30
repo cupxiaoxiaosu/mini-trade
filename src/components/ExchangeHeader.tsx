@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Select, Badge, Layout } from 'antd';
 import { useTranslation } from 'react-i18next';
 import './styles/layout.css';
@@ -54,5 +54,5 @@ const ExchangeHeader: React.FC<ExchangeHeaderProps> = ({
   );
 };
 
-export default ExchangeHeader;
+export default memo(ExchangeHeader);
 

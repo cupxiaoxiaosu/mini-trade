@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo, useCallback } from 'react';
 import { Form, Input, Button, Card, message } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { getApiKey, getApiSecret } from '../adaptor/biance/config';
@@ -22,7 +22,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
     });
   }, [form]);
 
-  const handleSubmit = async (values: { apiKey: string; apiSecret: string }) => {
+  const handleSubmit = useCallback(async (values: { apiKey: string; apiSecret: string }) => {
     setLoading(true);
     
     try {
@@ -45,7 +45,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [onLogin, t]);
 
   return (
     <div className="login-container">
@@ -114,5 +114,5 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   );
 };
 
-export default Login;
+export default memo(Login);
 

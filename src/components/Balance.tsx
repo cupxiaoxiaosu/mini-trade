@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { Card, Statistic, Row, Col, Spin, Alert } from 'antd';
 import type { Balance } from '../adaptor/biance';
 import { binanceApi } from '../adaptor/biance';
@@ -210,4 +210,4 @@ const Balance: React.FC = () => {
   );
 };
 
-export default Balance;
+export default memo(Balance);

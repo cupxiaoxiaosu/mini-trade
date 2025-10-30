@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { AdvancedRealTimeChart } from 'react-ts-tradingview-widgets';
 import './styles/common.css';
 
@@ -32,4 +32,4 @@ export const Kline: React.FC<KlineProps> = ({ token }) => {
 };
 
 
-export default Kline;
+export default memo(Kline);

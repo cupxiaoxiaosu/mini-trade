@@ -67,7 +67,6 @@ const TradeForm: React.FC<TradeFormProps> = ({
   }, [quantity, price, orderType, currentPrice, side, balance, coinBalance, calculateInvestmentWorker]);
 
   
-  console.log('quantityPercentage', balance, coinBalance,balance * quantity / 100 , currentPrice);
 
   // 提交订单
   const handleSubmit = async () => {
@@ -175,6 +174,7 @@ const TradeForm: React.FC<TradeFormProps> = ({
 
   const coinSymbol = selectedToken.split('USDT')[0];
 
+  console.log('trade form render')
   return (
     <>
       {/* 下划线切换按钮 */}
@@ -365,4 +365,14 @@ const TradeForm: React.FC<TradeFormProps> = ({
   );
 };
 
-export default TradeForm;
+// 自定义比较函数，优化组件重渲染
+const arePropsEqual = (prevProps: TradeFormProps, nextProps: TradeFormProps): boolean => {
+  // 只有当关键属性发生变化时才重渲染
+  return prevProps.selectedToken === nextProps.selectedToken &&
+         prevProps.onOrderCreated === nextProps.onOrderCreated &&
+         prevProps.balance === nextProps.balance &&
+         prevProps.coinBalance === nextProps.coinBalance &&
+         prevProps.currentPrice === nextProps.currentPrice;
+};
+
+export default React.memo(TradeForm, arePropsEqual);

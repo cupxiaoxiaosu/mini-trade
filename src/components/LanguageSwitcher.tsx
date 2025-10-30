@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Select } from 'antd';
 import { useTranslation } from 'react-i18next';
 import './styles/common.css';
@@ -30,5 +30,5 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ onLanguageChange })
   );
 };
 
-export default LanguageSwitcher;
+export default memo(LanguageSwitcher);
 

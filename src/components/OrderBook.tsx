@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Table } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useTranslation } from 'react-i18next';
@@ -97,4 +97,4 @@ export const OrderBook: React.FC<OrderBookProps> = ({ data, token }) => {
   );
 };
 
-export default OrderBook;
+export default memo(OrderBook);

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Button } from 'antd';
 import { useTranslation } from 'react-i18next';
 
@@ -30,6 +30,6 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({ isDark, onToggle }) => {
   );
 };
 
-export default ThemeToggle;
+export default memo(ThemeToggle);
 
 

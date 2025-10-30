@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, memo, useCallback } from 'react';
 import { Layout, Card, Divider, Button } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { useBinanceWebSocket } from '@/hooks/useBinanceWebSocket';
@@ -27,7 +27,7 @@ const Main: React.FC = () => {
   const [ordersLoading, setOrdersLoading] = useState<boolean>(false);
   
   // 获取真实余额数据
-  const fetchBalances = async () => {
+  const fetchBalances = useCallback(async () => {
     try {
       const accountInfo = await binanceApi.getAccountInfo();
       const specificSymbols = ['USDT', 'SOL', 'ETH', 'BTC'];
@@ -49,23 +49,23 @@ const Main: React.FC = () => {
       console.error('获取余额失败:', err);
       // 保留默认值
     }
-  };
+  }, [selectedToken, setUsdtBalance, setSelectedCoinBalance]);
   
   // 当选中币种变化时，获取对应币种的余额
   useEffect(() => {
     fetchBalances();
   }, [selectedToken, isConnected]);
 
-  const handleSymbolChange = (value: string) => {
+  const handleSymbolChange = useCallback((value: string) => {
     setSelectedToken(value.toUpperCase() as Token);
-  };
+  }, []);
 
   const [refreshKey, setRefreshKey] = useState<number>(0);
 
-  const handleOrderCreated = () => {
+  const handleOrderCreated = useCallback(() => {
     setRefreshKey(prev => prev + 1);
     fetchBalances();
-  };
+  }, [fetchBalances]);
 
   const coinSymbol = selectedToken.split('USDT')[0];
 
@@ -192,4 +192,4 @@ const Main: React.FC = () => {
   );
 };
 
-export default Main;
+export default memo(Main);

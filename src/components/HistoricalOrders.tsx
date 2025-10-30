@@ -1,4 +1,4 @@
-import { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
+import React, { useState, useEffect, useImperativeHandle, forwardRef, memo } from 'react';
 import { Table, Spin, Alert, Empty, Button } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useTranslation } from 'react-i18next';
@@ -23,6 +23,7 @@ const HistoricalOrders = forwardRef<HistoricalOrdersRef, HistoricalOrdersProps>(
   const [error, setError] = useState<string | null>(null);
   const [limit] = useState<number>(20);
 
+  console.log('his order render')
   // 获取历史订单数据
   const fetchHistoricalOrders = async () => {
     setLoading(true);
@@ -186,4 +187,10 @@ const HistoricalOrders = forwardRef<HistoricalOrdersRef, HistoricalOrdersProps>(
 
 HistoricalOrders.displayName = 'HistoricalOrders';
 
-export default HistoricalOrders;
+// 自定义比较函数，优化组件重渲染
+const arePropsEqual = (prevProps: HistoricalOrdersProps, nextProps: HistoricalOrdersProps): boolean => {
+  // 只有当 symbol 或 onLoadingChange 函数引用发生变化时才重渲染
+  return prevProps.symbol === nextProps.symbol && prevProps.onLoadingChange === nextProps.onLoadingChange;
+};
+
+export default React.memo(HistoricalOrders, arePropsEqual);
