@@ -159,7 +159,25 @@ const TradeForm: React.FC<TradeFormProps> = ({
     } catch (error: any) {
       // 9. 处理错误
       console.error('下单失败:', error);
-      message.error(`${t('tradeForm.orderFailed')}: ${error.message || '未知错误'}`);
+      const errorMessage = error.message || error.response?.data?.msg || '未知错误';
+      message.error(`${t('tradeForm.orderFailed')}: ${errorMessage}`);
+      // 同时使用notification显示更详细的错误信息
+      notification.error({
+        message: t('tradeForm.orderFailed'),
+        description: (
+          <div style={{ lineHeight: '1.8' }}>
+            <div style={{ marginBottom: '4px' }}><strong>{t('tradeForm.errorDetails')}:</strong> {errorMessage}</div>
+            <div style={{ marginBottom: '4px' }}><strong>{t('tradeForm.symbol')}:</strong> {selectedToken}</div>
+            <div style={{ marginBottom: '4px' }}><strong>{t('tradeForm.side')}:</strong> {side}</div>
+            <div style={{ marginBottom: '4px' }}><strong>{t('tradeForm.type')}:</strong> {orderType}</div>
+            <div style={{ fontSize: '12px', color: 'var(--text-tertiary)' }}>
+              {t('tradeForm.pleaseCheck')}
+            </div>
+          </div>
+        ),
+        duration: 8,
+        placement: 'topRight',
+      });
     } finally {
       // 10. 无论成功失败，都设置loading为false
       setLoading(false);

@@ -69,7 +69,12 @@
     "insufficientUSDT": "USDT余额不足，请减少购买数量",
     "insufficientCoin": "{{coin}}余额不足，请减少卖出数量",
     "orderCreated": "订单创建成功",
-    "orderFailed": "订单创建失败"
+    "orderFailed": "订单创建失败",
+    "errorDetails": "错误详情",
+    "symbol": "交易对",
+    "side": "方向",
+    "type": "订单类型",
+    "pleaseCheck": "请检查详情后重试"
   },
   "historicalOrders": {
     "orderId": "订单ID",

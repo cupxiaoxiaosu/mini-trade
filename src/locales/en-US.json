@@ -69,7 +69,12 @@
     "insufficientUSDT": "Insufficient USDT balance, please reduce purchase quantity",
     "insufficientCoin": "Insufficient {{coin}} balance, please reduce sell quantity",
     "orderCreated": "Order created successfully",
-    "orderFailed": "Order creation failed"
+    "orderFailed": "Order creation failed",
+    "errorDetails": "Error Details",
+    "symbol": "Trading Pair",
+    "side": "Direction",
+    "type": "Order Type",
+    "pleaseCheck": "Please check the details and try again"
   },
   "historicalOrders": {
     "orderId": "Order ID",
